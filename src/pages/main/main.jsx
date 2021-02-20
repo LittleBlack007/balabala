@@ -25,8 +25,8 @@ class Main extends React.Component {
                     <Content>
                         <div style={{borderStyle:'solid',borderBottomWidth:3,borderBottomColor:'#1DA57A'}}></div>
                         <Switch>
-                            <Route path='/forum' component={Forum} />
                             <Route path='/forum/user-info' component={UserInfo} />
+                            <Route path='/forum' component={Forum} />
                         </Switch>
                     </Content>
                     <Footer>Footer</Footer>
