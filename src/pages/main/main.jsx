@@ -1,7 +1,6 @@
 import React from 'react';
 import {Layout} from 'antd';
 import {Switch, Route} from 'react-router-dom';
-import UserInfo from '../forum/userInfo'
 import HeadNav from '../../components/head-nav';
 import HeadFirst from '../../components/head-first';
 import Forum from '../forum';
@@ -18,18 +17,17 @@ class Main extends React.Component {
 
     render() {
         return (
-            <div>
+            <div style={{minHeight:'100%'}}>
                 <HeadFirst />
                 <Layout>
-                    {/* <Header style={{padding:'0 0'}}>header</Header> */}
+                    <Header style={{padding:'0 0'}}>header</Header>
                     <Content>
                         <div style={{borderStyle:'solid',borderBottomWidth:3,borderBottomColor:'#1DA57A'}}></div>
                         <Switch>
-                            <Route path='/forum/user-info' component={UserInfo} />
                             <Route path='/forum' component={Forum} />
                         </Switch>
                     </Content>
-                    <Footer>Footer</Footer>
+                    <Footer style={{textAlign:'center'}}>@巴拉巴拉家装平台</Footer>
                 </Layout>
             </div>
         )
