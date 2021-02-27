@@ -1,6 +1,7 @@
 import React from 'react';
 import RichTextEditor from './rich-text-editor'
 import { Form, Input, Button, Select, Card } from 'antd';
+import PicturesWall from '../../../components/picture-wall';
 
 const Option = Select.Option;
 
@@ -46,6 +47,7 @@ class PostForum extends React.Component {
         this.state = {
         };
         this.editor = React.createRef();
+        this.picturesWall = React.createRef();
     }
 
     submic = ()=>{
@@ -87,6 +89,9 @@ class PostForum extends React.Component {
                     </Form.Item>
                     <Form.Item label='正文' labelCol={{span:4}} wrapperCol={{span:18}} >
                         <RichTextEditor ref={this.editor} />
+                    </Form.Item>
+                    <Form.Item>
+                        <PicturesWall ref={this.picturesWall} />
                     </Form.Item>
                     <Form.Item>
                         <Button type="primary" onClick={this.submic}>发布帖子</Button>
