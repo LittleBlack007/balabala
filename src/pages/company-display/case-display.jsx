@@ -28,7 +28,7 @@ class CaseDisplay extends React.Component {
         return (
             <Card>
                 <Row gutter={16}>
-                    <Col {...colPhone} xl={16} style={{borderStyle:'solid',borderWidth:'1px',borderColor:'#f0f0f0',padding:5}}>
+                    <Col {...colPhone} xl={18} style={{borderStyle:'solid',borderWidth:'1px',borderColor:'#f0f0f0',padding:5}}>
                         <Row 
                             gutter={16}
                             title='世纪花园'
@@ -43,7 +43,7 @@ class CaseDisplay extends React.Component {
                             </Col>
                         </Row>
                     </Col>
-                    <Col {...colPhone} xl={8}>
+                    <Col {...colPhone} xl={6}>
                         <Card title='设计师信息' bodyStyle={{textAlign:'center',color:'#f0f0ff0'}}>
                             <Avatar size={86} src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" /><br />
                             <span style={{fontWeight:'bold',color:'#666666'}}>{personData.name}</span><br />

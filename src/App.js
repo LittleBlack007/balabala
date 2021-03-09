@@ -1,5 +1,6 @@
 import React,{Component} from 'react'
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import CompanyManage from './pages/company-manage';
 import Main from '../src/pages/main'
 
 class App extends Component {
@@ -14,6 +15,7 @@ class App extends Component {
     return(
       <BrowserRouter>
         <Switch>
+          <Route path='/company-manage' component={CompanyManage} />
           <Route path='/' component={Main} />
         </Switch>
       </BrowserRouter>

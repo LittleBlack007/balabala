@@ -6,7 +6,7 @@ import './index.less';
 
 const navList = [
     { path: '/', text: '我的订单' },
-    { path: '/', text: '商家中心' },
+    { path: '/company-manage', text: '商家中心' },
     { path: '/', text: '工人中心' },
     { path: '/forum', text: '我的论坛' }
 ]
