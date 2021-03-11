@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form, Input, Button } from 'antd';
 import PicturesWall from '../../components/picture-wall';
-import ChangeImage from '../../components/change-image'
+import ChangeImage from '../../components/change-image';
 
 const { TextArea } = Input;
 

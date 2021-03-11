@@ -3,13 +3,14 @@ import { Drawer, Button } from 'antd';
 import CaseList from './case-list';
 import CommentList from './comment-list';
 import CompanyDetail from './company-detail';
+import StaffManage from './staff-manage';
 
 class DrawerContain extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             visible:false,
-            show:{'案例置顶':<CaseList />,'订单信息':<CommentList />,'公司信息':<CompanyDetail />}
+            show:{'案例置顶':<CaseList />,'订单信息':<CommentList />,'公司信息':<CompanyDetail />,'员工管理':<StaffManage />}
         };
     }
 
