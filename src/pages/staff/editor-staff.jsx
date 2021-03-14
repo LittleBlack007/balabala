@@ -1,5 +1,6 @@
 import React from 'react';
 import { Modal, Form, Input, Button, Select } from 'antd';
+import ChangeImage from '../../components/change-image'
 
 const {TextArea} = Input
 const { Option } = Select;
@@ -26,7 +27,7 @@ const tailFormItemLayout = {
     },
 };
 
-class AddStaff extends React.Component {
+class EditorStaff extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -61,10 +62,11 @@ class AddStaff extends React.Component {
         const { modalVisible } = this.state;
         return (
             <>
-                <Button type="link" onClick={this.showModal} style={{ color: 'white' }}>
-                    添加员工
+                <Button type="link" onClick={this.showModal}>
+                    个人编辑
                 </Button>
-                <Modal title="添加新员工" visible={modalVisible} onCancel={this.handleCancel} footer={null} width={'70%'}>
+                <Modal title="编辑个人资料" visible={modalVisible} onCancel={this.handleCancel} footer={null} width={'70%'}>
+                    <ChangeImage />
                     <Form
                         {...formItemLayout}
                         ref={this.formRef}
@@ -96,56 +98,6 @@ class AddStaff extends React.Component {
                                 {this.state.a ? this.state.a.map(item => (<Option key={item.key}>{item.name}</Option>)) : null}
                             </Select>
                         </Form.Item>
-                        <Form.Item
-                            name='staff_sex'
-                            label='性别'
-                            rules={[
-                                { required: true, message: '请选择职业类型。' }
-                            ]}
-                        >
-                            <Select placehold='性别'>
-                                <Option value={0}>女</Option>
-                                <Option value={1}>男</Option>
-                            </Select>
-                        </Form.Item>
-                        <Form.Item
-                            name="password"
-                            label="密码"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: 'Please input your password!',
-                                },
-                            ]}
-                            hasFeedback
-                        >
-                            <Input.Password />
-                        </Form.Item>
-
-                        <Form.Item
-                            name="confirm"
-                            label="确认密码"
-                            dependencies={['password']}
-                            hasFeedback
-                            rules={[
-                                {
-                                    required: true,
-                                    message: 'Please confirm your password!',
-                                },
-                                ({ getFieldValue }) => ({
-                                    validator(_, value) {
-                                        if (!value || getFieldValue('password') === value) {
-                                            return Promise.resolve();
-                                        }
-
-                                        return Promise.reject(new Error('The two passwords that you entered do not match!'));
-                                    },
-                                }),
-                            ]}
-                        >
-                            <Input.Password />
-                        </Form.Item>
-
                         <Form.Item
                             name="staff_name"
                             label="真实姓名"
@@ -239,13 +191,55 @@ class AddStaff extends React.Component {
                         </Form.Item>
                         <Form.Item {...tailFormItemLayout}>
                             <Button type="primary" htmlType="submit">
-                                确定添加
+                                提交修改
                             </Button>
                         </Form.Item>
                     </Form>
+                    <Form name="change_pwd" onFinish={this.onFinish} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
+                    <Form.Item
+                        name="password"
+                        label="新密码"
+                        rules={[
+                            {
+                                required: true,
+                                message: 'Please input your password!',
+                            },
+                        ]}
+                        hasFeedback
+                    >
+                        <Input.Password style={{ width: '30%' }} type="password" placeholder="密码" />
+                    </Form.Item>
+                    <Form.Item
+                        name="confirm"
+                        label="确认密码"
+                        dependencies={['password']}
+                        hasFeedback
+                        rules={[
+                            {
+                                required: true,
+                                message: 'Please confirm your password!',
+                            },
+                            ({ getFieldValue }) => ({
+                                validator(_, value) {
+                                    if (!value || getFieldValue('password') === value) {
+                                        return Promise.resolve();
+                                    }
+                                    return Promise.reject(new Error('两个密码不一致'));
+                                },
+                            }),
+                        ]}
+                    >
+                        <Input.Password style={{ width: '30%' }} />
+                    </Form.Item>
+                    <Form.Item label=" " colon={false}>
+                        <Button type="primary" htmlType="submit">
+                            修改密码
+                            </Button>
+                    </Form.Item>
+                </Form>
                 </Modal>
             </>
         )
     }
 }
-export default AddStaff;
+export default EditorStaff;

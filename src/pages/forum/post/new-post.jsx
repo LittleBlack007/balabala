@@ -1,5 +1,5 @@
 import React from 'react';
-import RichTextEditor from './rich-text-editor'
+import RichTextEditor from '../../../components/rich-text-editor/rich-text-editor'
 import { Form, Input, Button, Select, Card } from 'antd';
 import PicturesWall from '../../../components/picture-wall';
 

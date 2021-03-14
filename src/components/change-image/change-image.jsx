@@ -50,7 +50,7 @@ class ChangeImage extends React.Component {
                             //onPreview={this.handlePreview} 
                             onChange={this.handleChange} 
                         > 
-                            <Button type='primary'>修改标志</Button> 
+                            <Button type='primary'>修改</Button> 
                         </Upload>
                     </div>
             </div>

@@ -53,9 +53,6 @@ class UserInfo extends React.Component {
                         <TabPane tab="收藏" key="3">
                             Content of Tab Pane 3
                     </TabPane>
-                        <TabPane tab="关注" key="4">
-                            Content of Tab Pane 4
-                    </TabPane>
                     </Tabs>
                 </Card>
             </div>

@@ -106,6 +106,7 @@ class PostDetail extends React.Component {
                                 content={item.content}
                                 datetime={item.datetime}
                             />
+                            
                         </li>
                     )}
                 />

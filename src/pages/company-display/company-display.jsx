@@ -5,7 +5,6 @@ import { PhoneTwoTone } from '@ant-design/icons';
 import DisplayTabs from './display-tabs';
 import './index.less'
 import HD3 from '../../assets/images/huodong3.jpg';
-import CaseDisplay from './case-display';
 
 const companyData = '我们是上海市装饰协会信的过企业之一，长三角区域绿色环保装潢示范单位，全国500强家装企业之一，360度无醛装修工艺技术，让客户零等待可搬新家。齐家老字号，连续10年荣获优质口碑。公司讲诚信、重质量，您的满意是我们的宗旨。一次装修，终身朋友！'
 
@@ -60,11 +59,7 @@ class CompanyDisplay extends React.Component {
                         </Row>
                     </div>
                 </div>
-                <Switch>
-                    <Route path='/balabala/company-display/case' component={CaseDisplay} />
-                    <Route path='/balabala/company-display/all' component={DisplayTabs} />
-                    <Redirect to='/balabala/company-display/all' />
-                </Switch>
+                <DisplayTabs />
             </div>
         )
     }

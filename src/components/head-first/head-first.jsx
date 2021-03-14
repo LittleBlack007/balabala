@@ -5,9 +5,9 @@ import { Link, withRouter } from 'react-router-dom';
 import './index.less';
 
 const navList = [
-    { path: '/', text: '我的订单' },
+    { path: '/user', text: '个人中心' },
     { path: '/company-manage', text: '商家中心' },
-    { path: '/', text: '工人中心' },
+    { path: '/staff-center', text: '工人中心' },
     { path: '/forum', text: '我的论坛' }
 ]
 const HeadFirstNav = (props) => {
