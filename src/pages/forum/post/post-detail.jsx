@@ -13,15 +13,19 @@ const personInfo = {
 }
 const data = [
     {
-        actions: [<span key="comment-list-reply-to-0">Reply to</span>],
+        // actions: [<span key="comment-list-reply-to-0">Reply to</span>],
         author: 'Han Solo',
         avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
         content: (
-            <p>
+            <><p>
                 We supply a series of design principles, practical patterns and high quality design
                 resources (Sketch and Axure), to help people create their product prototypes beautifully and
                 efficiently.
+                
             </p>
+            <img src='https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png' style={{width:'100px',height:'100px'}}  alt='图片'/>&nbsp;
+            <img src='https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png' style={{width:'100px',height:'100px'}}  alt='图片'/>
+            </>
         ),
         datetime: (
             <Tooltip title={moment().subtract(1, 'days').format('YYYY-MM-DD HH:mm:ss')}>

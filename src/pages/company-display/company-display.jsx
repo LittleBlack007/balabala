@@ -48,9 +48,6 @@ class CompanyDisplay extends React.Component {
                                     <span>92.23% 好评率</span>
                                     <p>订单数：88888</p>
                                 </div>
-                                <div>
-                                    <Button type='primary' style={{ width: '200px' }} >在线咨询</Button>
-                                </div>
                                 <div style={{ marginTop: 20, fontSize: 18 }}>
                                     <PhoneTwoTone twoToneColor='#1DA57A' />电话咨询：18888888888
                             </div>

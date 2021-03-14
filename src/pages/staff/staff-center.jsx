@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Avatar, Row, Col, Card, Statistic, Select, Table, Switch, Pagination, Collapse } from 'antd';
+import { Button, Avatar, Row, Col, Card, Statistic, Tooltip, Table, Switch, Pagination, Collapse, Comment, List } from 'antd';
+import moment from 'momnet';
 import AddCaseForm from './add-case-form';
 import EditorStaff from './editor-staff';
 
@@ -185,6 +186,47 @@ const columns = {
     ]
 }
 
+const data = [
+    {
+        actions: [<span key="comment-list-reply-to-0">差评</span>],
+        author: 'Han Solo',
+        avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
+        content: (
+            <><p>
+                We supply a series of design principles, practical patterns and high quality design
+                resources (Sketch and Axure), to help people create their product prototypes beautifully and
+                efficiently.
+                
+            </p>
+            <img src='https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png' style={{width:'100px',height:'100px'}}  alt='图片'/>&nbsp;
+            <img src='https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png' style={{width:'100px',height:'100px'}}  alt='图片'/>
+            </>
+        ),
+        datetime: (
+            <Tooltip title={moment().subtract(1, 'days').format('YYYY-MM-DD HH:mm:ss')}>
+                <span>{moment().subtract(1, 'days').fromNow()}</span>
+            </Tooltip>
+        ),
+    },
+    {
+        actions: [<span key="comment-list-reply-to-0">好评</span>],
+        author: 'Han Solo',
+        avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
+        content: (
+            <p>
+                We supply a series of design principles, practical patterns and high quality design
+                resources (Sketch and Axure), to help people create their product prototypes beautifully and
+                efficiently.
+            </p>
+        ),
+        datetime: (
+            <Tooltip title={moment().subtract(2, 'days').format('YYYY-MM-DD HH:mm:ss')}>
+                <span>{moment().subtract(2, 'days').fromNow()}</span>
+            </Tooltip>
+        ),
+    },
+];
+
 class StaffCenter extends React.Component {
     constructor(props) {
         super(props);
@@ -258,7 +300,24 @@ class StaffCenter extends React.Component {
                 </Row>
                 <Collapse defaultActiveKey={['1']}  style={{margin:'20px 20px'}}>
                     <Panel header="业主评价" key="1">
-                        <p>123</p>
+                    <List
+                    className="comment-list"
+                    header={`${data.length} 条评价`}
+                    itemLayout="horizontal"
+                    dataSource={data}
+                    renderItem={item => (
+                        <li>
+                            <Comment
+                                actions={item.actions}
+                                author={item.author}
+                                avatar={item.avatar}
+                                content={item.content}
+                                datetime={item.datetime}
+                            />
+                            
+                        </li>
+                    )}
+                />
                     </Panel>
                     <Panel header="个人案例" key="2">
                         <Row gutter={16}>

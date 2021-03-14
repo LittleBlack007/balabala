@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, Col, Row, Tag, Avatar, Button } from 'antd';
 import H3 from '../../assets/images/huodong3.jpg';
+import {Link} from 'react-router-dom';
 
 const colPhone = {
     xl: 24,
@@ -15,6 +16,7 @@ const personData = {
     time: '8年',
     praiseRate: 4.5
 }
+const postDetailData = '<p>123</p><p>321</p><ul><li><span style="font-size: 24px;">2222</span></li></ul><ol><li><span style="font-size: 24px;">21321</span></li></ol>'
 
 class CaseDisplay extends React.Component {
     constructor(props) {
@@ -44,7 +46,7 @@ class CaseDisplay extends React.Component {
                         </Row>
                     </Col>
                     <Col {...colPhone} xl={6}>
-                        <Card title='设计师信息' bodyStyle={{ color: '#f0f0ff0' }}>
+                        <Card title='Ta的信息' bodyStyle={{ color: '#f0f0ff0' }}>
                             <Row>
                                 <Col {...colPhone} xl={12}>
                                     <Avatar size={86} src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
@@ -56,11 +58,12 @@ class CaseDisplay extends React.Component {
                             </Row>
                             <div style={{padding:'10px'}}>&nbsp;&nbsp;个人简介:{personData.goodAt}</div>
                             <div style={{textAlign:'center'}}>
-                                <Button type='primary' style={{width:'200px'}}>在线联系</Button>
+                                <Button type='primary' style={{width:'200px'}}><Link to='/balabala/staff'>Ta的主页</Link></Button>
                             </div>
                         </Card>
                     </Col>
                 </Row>
+                <Card style={{marginTop:'20px'}}><div dangerouslySetInnerHTML={{__html:postDetailData}}></div></Card>
             </Card>
         )
     }
