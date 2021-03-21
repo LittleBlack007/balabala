@@ -32,6 +32,7 @@ const dataSource = {
     doing: [
         {
             order_id: '11231231231a2',
+            customer_phone:'13232672652',
             customer_name: '李四',
             work_address: '广东省吴川市巴拉巴拉村',
             status: '进行中',
@@ -39,6 +40,7 @@ const dataSource = {
         },
         {
             order_id: '11231231231d2',
+            customer_phone:'13232672652',
             customer_name: '李四',
             work_address: '广东省吴川市巴拉巴拉村',
             status: '准备中',
@@ -46,6 +48,7 @@ const dataSource = {
         },
         {
             order_id: '112312312f312',
+            customer_phone:'13232672652',
             customer_name: '李四',
             work_address: '广东省吴川市巴拉巴拉村',
             status: '准备中',
@@ -53,6 +56,7 @@ const dataSource = {
         },
         {
             order_id: '11231231h2312',
+            customer_phone:'13232672652',
             customer_name: '李四',
             work_address: '广东省吴川市巴拉巴拉村',
             status: '准备中',
@@ -62,6 +66,7 @@ const dataSource = {
     finish: [
         {
             order_id: '1123123j12312',
+            customer_phone:'13232672652',
             customer_name: '李四',
             status: '已完成',
             commission: 10000,
@@ -70,6 +75,7 @@ const dataSource = {
         },
         {
             order_id: '11231231k2312',
+            customer_phone:'13232672652',
             customer_name: '李四',
             status: '已完成',
             commission: 10000,
@@ -78,6 +84,7 @@ const dataSource = {
         },
         {
             order_id: '1123123l12312',
+            customer_phone:'13232672652',
             customer_name: '李四',
             status: '已完成',
             commission: 10000,
@@ -86,6 +93,7 @@ const dataSource = {
         },
         {
             order_id: '1123123p12312',
+            customer_phone:'13232672652',
             customer_name: '李四',
             status: '已完成',
             commission: 10000,
@@ -115,6 +123,11 @@ const columns = {
             title: '业主名字',
             dataIndex: 'customer_name',
             key: 'dcustomer_name',
+        },
+        {
+            title: '业主电话',
+            dataIndex: 'customer_phone',
+            key: 'customer_phone',
         },
         {
             title: '工作地点',
@@ -148,6 +161,11 @@ const columns = {
             title: '业主名字',
             dataIndex: 'customer_name',
             key: 'customer_name',
+        },
+        {
+            title: '业主电话',
+            dataIndex: 'customer_phone',
+            key: 'customer_phone',
         },
         {
             title: '当前状态',

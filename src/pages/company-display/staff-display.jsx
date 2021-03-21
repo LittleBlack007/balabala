@@ -141,13 +141,6 @@ class StaffDisplay extends React.Component {
                         </Collapse>
                     </Col>
                     <Col {...colPhone} xl={6}>
-                        <Card style={{marginBottom:'20px'}}>
-                            <div style={{ width: '100%', height: 96, marginTop: 20, textAlign:'center' }}>
-                                <Rate count={5} defaultValue={4.5} disabled allowHalf />&nbsp;&nbsp;
-                                <span>92.23% 好评率</span>
-                                <p>订单数：88888</p>
-                            </div>
-                        </Card>
                         <Card title='Ta的信息' bodyStyle={{ color: '#f0f0ff0' }}>
                             <Row>
                                 <Col {...colPhone} xl={12}>
@@ -166,7 +159,13 @@ class StaffDisplay extends React.Component {
                                 <Button type='primary' style={{ width: '200px' }}>创建订单</Button>
                             </div>
                         </Card>
-                    
+                        <Card style={{marginBottom:'20px'}}>
+                            <div style={{ width: '100%', height: 96, marginTop: 20, textAlign:'center' }}>
+                                <Rate count={5} defaultValue={4.5} disabled allowHalf />&nbsp;&nbsp;
+                                <span>92.23% 好评率</span>
+                                <p>订单数：88888</p>
+                            </div>
+                        </Card>
                     </Col>
                 </Row>
             </Card>

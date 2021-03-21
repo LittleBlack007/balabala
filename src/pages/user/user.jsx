@@ -21,6 +21,7 @@ const dataSource = {
             work_content:'设计一个好看的设计稿',
             order_id: '11231231231a2',
             staff_name: '李四',
+            staff_phone:'13232672652',
             work_address: '广东省吴川市巴拉巴拉村',
             status: '进行中',
             order_date:'2021-01-12',
@@ -30,6 +31,7 @@ const dataSource = {
         },
         {
             work_content:'设计一个好看的设计稿',
+            staff_phone:'13232672652',
             order_id: '11231231231d2',
             staff_name: '李四',
             work_address: '广东省吴川市巴拉巴拉村',
@@ -41,6 +43,7 @@ const dataSource = {
         },
         {
             work_content:'设计一个好看的设计稿',
+            staff_phone:'13232672652',
             order_id: '112312312f312',
             staff_name: '李四',
             work_address: '广东省吴川市巴拉巴拉村',
@@ -51,6 +54,7 @@ const dataSource = {
         },
         {
             work_content:'设计一个好看的设计稿',
+            staff_phone:'13232672652',
             order_id: '11231231h2312',
             staff_name: '李四',
             work_address: '广东省吴川市巴拉巴拉村',
@@ -65,6 +69,7 @@ const dataSource = {
         {
             work_content:'设计一个好看的设计稿',
             order_id: '1123123j12312',
+            staff_phone:'13232672652',
             staff_name: '李四',
             status: '已完成',
             commission: 10000,
@@ -74,6 +79,7 @@ const dataSource = {
         },
         {
             work_content:'设计一个好看的设计稿',
+            staff_phone:'13232672652',
             order_id: '11231231k2312',
             staff_name: '李四',
             status: '已完成',
@@ -84,6 +90,7 @@ const dataSource = {
         },
         {
             work_content:'设计一个好看的设计稿',
+            staff_phone:'13232672652',
             order_id: '1123123l12312',
             staff_name: '李四',
             status: '已完成',
@@ -94,6 +101,7 @@ const dataSource = {
         },
         {
             work_content:'设计一个好看的设计稿',
+            staff_phone:'13232672652',
             order_id: '1123123p12312',
             staff_name: '李四',
             status: '已完成',
@@ -167,6 +175,7 @@ class StaffCenter extends React.Component {
                                 >
                                     <Column title='订单ID' dataIndex='order_id' key='order_id' />
                                     <Column title='设计者名字' dataIndex='staff_name' key='staff_name' />
+                                    <Column title='设计者电话' dataIndex='staff_phone' key='staff_phone' />
                                     <Column title='当前状态' dataIndex='status' key='status'/>
                                     <Column
                                         title='佣金(￥)'
@@ -223,6 +232,7 @@ class StaffCenter extends React.Component {
                                 >
                                     <Column title='订单ID' dataIndex='order_id' key='dorder_id' />
                                     <Column title='设计者名字' dataIndex='staff_name' key='dstaff_name' />
+                                    <Column title='设计者电话' dataIndex='staff_phone' key='staff_phone' />
                                     <Column title='当前状态' dataIndex='status' key='dstatus'/>
                                     <Column
                                         title='佣金(￥)'
