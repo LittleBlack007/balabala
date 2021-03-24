@@ -9,6 +9,7 @@ import Balabala from '../balabala';
 import CompanyDisplay from '../company-display';
 import CaseDisplay from '../company-display/case-display';
 import StaffDisplay from '../company-display/staff-display';
+import AddOrder from '../balabala/add-order';
 import './index.less';
 
 const { Header, Footer, Content } = Layout;
@@ -40,6 +41,7 @@ class Main extends React.Component {
                     </Header>
                     <Content>
                         <Switch>
+                            <Route path='/balabala/add-order/:staffId' component={AddOrder} />
                             <Route path='/balabala/staff' component={StaffDisplay} />
                             <Route path='/balabala/company-display/case' component={CaseDisplay} />
                             <Route path='/balabala/company-display' component={CompanyDisplay} />

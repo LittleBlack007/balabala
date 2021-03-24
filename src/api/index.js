@@ -61,3 +61,20 @@ export const updatePostLikes = (id,count) => ajax("/post/update-post",{id:id,pos
 export const getPostUserById = id => ajax("/post/get-postUserById",{postId:id})
 //通过id查询帖子
 export const getPostById = id => ajax("/post/get-postById",{postId:id})
+
+
+/**
+ * 评论接口
+*/
+//创建评价
+//删除评价
+//查询个人所有评价
+export const getCommentByUserId = (pageNum,id) => ajax('/comment/get-CommentByUserId',{pageNum:pageNum,userId:id})
+//查询post的评价
+
+
+/**
+ * 关注接口
+*/
+//通过userId查询所有个人关注帖子
+export const getCollectionByUserId = userId => ajax("/collection/getCollectionByUserId",{userId:userId});

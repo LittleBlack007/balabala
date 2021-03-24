@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Redirect} from 'react-router-dom';
+import {Redirect, Link} from 'react-router-dom';
 import { Form, Input, Button, message } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import './login.less'
@@ -108,6 +108,10 @@ class Login extends Component{
                             </Button>
                         </Form.Item>
                     </Form>
+                    <div style={{display:'flex',justifyContent:'space-between',fontSize:'12px'}}>
+                        <span>还没有账号？</span>
+                        <Link to={`/register/${type}`}>去注册</Link>
+                    </div>
                 </section>
             </div>
         )

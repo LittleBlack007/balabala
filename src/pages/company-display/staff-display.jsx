@@ -156,7 +156,9 @@ class StaffDisplay extends React.Component {
                                 <Button type='primary' style={{ width: '200px' }}>电话号码：13232672652</Button>
                             </div>
                             <div style={{ textAlign: 'center', marginTop:'20px' }}>
-                                <Button type='primary' style={{ width: '200px' }}>创建订单</Button>
+                                <Button type='primary' style={{ width: '200px' }}>
+                                    <Link to='/balabala/add-order/1'>创建订单</Link>
+                                </Button>
                             </div>
                         </Card>
                         <Card style={{marginBottom:'20px'}}>
