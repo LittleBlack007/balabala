@@ -1,12 +1,13 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Button, Avatar, Row, Col, Card, Tooltip, Select, Table, Switch, Popconfirm, Radio } from 'antd';
+import { Link, Redirect } from 'react-router-dom';
+import { Button, Avatar, Row, Col, Card, Tooltip, Table, Modal } from 'antd';
 import EditorUser from './editor-user';
 import { EyeInvisibleTwoTone } from '@ant-design/icons';
 import Column from 'antd/lib/table/Column';
 import NewRated from './new-rated';
+import memoryUtils from '../../utils/memoryUtils';
+import storageUtils from '../../utils/storageUtils';
 
-const { Option } = Select;
 const colPhone = {
     xl: 24,
     ls: 24,
@@ -136,9 +137,27 @@ class StaffCenter extends React.Component {
         this.setState({ [type]: key });
     };
 
+    logout = () => {
+        Modal.confirm({
+            content: '确定退出？',
+            okText:'确定',
+            cancelText:'取消',
+            onOk: () => {
+                storageUtils.removeUser();
+                memoryUtils.user = {};
+                this.props.history.replace('/');
+            },
+            onCancel: () => {}
+        })
+    }
+
 
 
     render() {
+        const user = memoryUtils.user;
+        if(!user.userStatus){
+            return <Redirect to='/login/user'/>
+        }
         return (
             <div>
                 <div style={{ display: 'flex', marginBottom: '20px', height: '60px', backgroundColor: '#1DA57A', color: 'white', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -146,14 +165,16 @@ class StaffCenter extends React.Component {
                         <span style={{ fontSize: '20px', fontWeight: 'bold' }}>&nbsp;&nbsp;个人中心</span>
                     </div>
                     <div>
+                        <Avatar size={48} src={memoryUtils.user.userImg} />&nbsp;&nbsp;&nbsp;
+                        <span style={{fontSize:'18px'}}>{memoryUtils.user.userName}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                         <Link to='/' style={{ color: 'white' }}>平台首页</Link>
-                        <Button type='link' onClick={this.logOut}>
-                            <Link to='/' style={{ color: 'white' }}>退出</Link>
+                        <EditorUser user={memoryUtils.user}/>
+                        <Button type='link' onClick={this.logout} style={{color:'white'}}>
+                            退出
                         </Button>
                     </div>
                 </div>
                 <Row gutter={24}>
-                    <Col {...colPhone} xl={18}>
                         <Card
                             style={{ width: '100%' }}
                             title="我的订单"
@@ -280,20 +301,6 @@ class StaffCenter extends React.Component {
                                 </Table>
                             }
                         </Card>
-                    </Col>
-                    <Col {...colPhone} xl={6}>
-                        <Card
-                            actions={[
-                                <EditorUser />,
-                            ]}
-                        >
-                            <Meta
-                                avatar={<Avatar size={64} src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
-                                title="王巴拉"
-                                description={<div><p>用户名：wangbala</p>电话：123123123123</div>}
-                            />
-                        </Card>
-                    </Col>
                 </Row>
             </div>
         )

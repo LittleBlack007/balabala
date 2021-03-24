@@ -114,7 +114,7 @@ export default class RichTextEditor extends Component {
                 //压缩后的图片转base64 url
                 /*canvas.toDataURL(mimeType, qualityArgument),mimeType 默认值是'image/png';
                   * qualityArgument表示导出的图片质量，只有导出为jpeg和webp格式的时候此参数才有效，默认值是0.92*/
-                let newUrl = canvas.toDataURL('image/jpeg', 0.92);//base64 格式
+                let newUrl = canvas.toDataURL('image/jpeg', 0.5);//base64 格式
 
                 resolve({
                     data: {

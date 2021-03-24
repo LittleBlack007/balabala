@@ -1,6 +1,9 @@
 import React from 'react';
-import { Modal, Form, Input, Button, Select } from 'antd';
-import ChangeImage from '../../components/change-image'
+import { Modal, Form, Input, Button, Select, message } from 'antd';
+import ChangeImage from '../../components/change-image';
+import memoryUtils from '../../utils/memoryUtils';
+import storageUtils from '../../utils/storageUtils'
+import {updateUser,reqLogin} from '../../api';
 
 const {TextArea} = Input
 const { Option } = Select;
@@ -49,36 +52,50 @@ class EditorUser extends React.Component {
         this.setState({ modalVisible: false })
     };
 
-    onFinish = (values) => {
-        console.log('Received values of form: ', values);
+    onFinish = async (values) => {
+        values.id = memoryUtils.user.id;
+        const result = await updateUser(values);
+        if(result.data.status === "success"){
+            const newUser = await reqLogin({userPetName:memoryUtils.user.userPetName,userPwd:memoryUtils.user.userPwd});
+            storageUtils.saveUser(newUser.data.data); 
+            message.success('修改成功')
+            window.history.go("/user-manage");
+        }
     };
 
+    onChangePwd = async (values) => {
+        const newPwd = values.password
+        const result = await updateUser({id:memoryUtils.user.id,userPwd:newPwd});
+        if(result.data.status === "success" && result.data.data === 1){
+            storageUtils.removeUser(); 
+            message.success('修改成功')
+            window.history.go("/user-manage");
+        }
+    }
+
     componentDidMount() {
-        const a = [{ key: '1', name: '设计师' }, { key: '2', name: '工人' }]
-        this.setState({ a: a })
     }
 
     render() {
         const { modalVisible } = this.state;
         return (
             <>
-                <Button type="link" onClick={this.showModal}>
+                <Button type="link" onClick={this.showModal} style={{color:'white'}}>
                     个人编辑
                 </Button>
                 <Modal title="编辑个人资料" visible={modalVisible} onCancel={this.handleCancel} footer={null} width={'70%'}>
-                    <ChangeImage />
+                    <ChangeImage imgUrl={this.props.user.userImg} api="/user/update-user"/>
                     <Form
                         {...formItemLayout}
                         ref={this.formRef}
                         name="register"
                         onFinish={this.onFinish}
-                        // initialValues={
+                        initialValues={this.props.user}
                         scrollToFirstError
-                        initialValues={{staff_pet_name:'dsfhskl',}}
                     >
                         <Form.Item
                             label='用户名'
-                            name="staff_pet_name"
+                            name="userPetName"
                             rules={[
                                 { required: true, message: '请输入用户名！' },
                                 { min: 4, message: '用户名最小长度为4位！' },
@@ -89,7 +106,7 @@ class EditorUser extends React.Component {
                             <Input disabled={true} />
                         </Form.Item>
                         <Form.Item
-                            name="staff_name"
+                            name="userName"
                             label="真实姓名"
                             tooltip="What do you want others to call you?"
                             rules={[
@@ -104,7 +121,7 @@ class EditorUser extends React.Component {
                         </Form.Item>
 
                         <Form.Item
-                            name="phone"
+                            name="userPhone"
                             label="电话号码"
                             rules={[
                                 {
@@ -120,7 +137,7 @@ class EditorUser extends React.Component {
                                 }}
                             />
                         </Form.Item>
-                        <Form.Item
+                        {/* <Form.Item
                             name="person_id"
                             label="身份证号码"
                             rules={[
@@ -136,32 +153,35 @@ class EditorUser extends React.Component {
                                     width: '100%',
                                 }}
                             />
-                        </Form.Item>
-                        <Form.Item label="现住地址">
-                            <Input.Group compact>
+                        </Form.Item> */}
+                        {/* <Form.Item label="现住地址">
+                            <Input.Group compact> */}
                                 <Form.Item
-                                    name={['address', 'province']}
-                                    noStyle
+                                    label='现住省份'
+                                    name='userProvince'
+                                    // noStyle
                                     rules={[
                                         { required: true, message: '请输入省份！' },
                                         { pattern: /^[\u4E00-\u9FA5]+$/, message: '请输入汉字！' }
                                     ]}
                                 >
-                                    <Input style={{ width: '10%' }} placeholder="省份" />
+                                    <Input style={{ width: '20%' }} placeholder="省份" />
                                 </Form.Item>
                                 <Form.Item
-                                    name={['address', 'city']}
-                                    noStyle
+                                    name='userCity'
+                                    label='显著城市'
+                                    // noStyle
                                     rules={[
                                         { required: true, message: '请输入城市！' },
                                         { pattern: /^[\u4E00-\u9FA5]+$/, message: '请输入汉字！' },
                                     ]}
                                 >
-                                    <Input style={{ width: '10%' }} placeholder="市" />
+                                    <Input style={{ width: '20%' }} placeholder="市" />
                                 </Form.Item>
                                 <Form.Item
-                                    name={['address', 'address']}
-                                    noStyle
+                                    name='userAddress'
+                                    label='详细地址'
+                                    // noStyle
                                     rules={[
                                         { required: true, message: '请输入详细地址！' },
                                         { pattern: /^[\u4E00-\u9FA5A-Za-z0-9]+$/, message: '只允许出现文字，数字，英文！' },
@@ -169,23 +189,23 @@ class EditorUser extends React.Component {
                                 >
                                     <Input style={{ width: '80%' }} placeholder="详细地址" />
                                 </Form.Item>
-                            </Input.Group>
-                        </Form.Item>
-                        <Form.Item
+                            {/* </Input.Group>
+                        </Form.Item> */}
+                        {/* <Form.Item
                             label="个人简介"
-                            name="person_profile"
+                            name="userProfile"
                         // rules={[{ required: true }]}
                         // style={{ display: 'inline-block', width: 'calc(50% - 8px)' }}
                         >
                             <TextArea maxLength={255} autoSize={{ minRows: 4 }} style={{ width: '75%' }} />
-                        </Form.Item>
+                        </Form.Item> */}
                         <Form.Item {...tailFormItemLayout}>
                             <Button type="primary" htmlType="submit">
                                 确定修改
                             </Button>
                         </Form.Item>
                     </Form>
-                    <Form name="change_pwd" onFinish={this.onFinish} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
+                    <Form name="change_pwd" onFinish={this.onChangePwd} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
                     <Form.Item
                         name="password"
                         label="新密码"

@@ -3,11 +3,15 @@ import {Redirect} from 'react-router-dom';
 import { Form, Input, Button, message } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import './login.less'
-import logo from "../../assets/images/logo.jpg";
-import {reqLogin} from '../../api/index'
+import {reqLogin,reqCompanyLogin,reqStaffLogin} from '../../api/index'
 import memoryUtils from '../../utils/memoryUtils'
 import storageUtils from '../../utils/storageUtils'
 
+const paramToText = {
+    user:'用户',
+    company:'公司',
+    staff:'员工'
+}
 class Login extends Component{
     constructor(props){
         super(props);
@@ -17,34 +21,55 @@ class Login extends Component{
     }
 
     formOnFinish = async values => {
-        const result = await reqLogin(values);
-        console.log(result);
-        if(result.data.status === 0){
+        const type = this.props.match.params.type; //进来的方式
+        let result = null;
+        if(type === 'user'){
+           result = await reqLogin({userPetName:values.name,userPwd:values.password});
+        }else if(type === 'staff'){
+            result = await reqStaffLogin({staffPetName:values.name,staffPwd:values.password})
+        }else if(type === 'company'){
+            result = await reqCompanyLogin({companyPetName:values.name,companyPwd:values.password})
+        }
+        if(result&&result.data && result.data.status === "success" && result.data.data){
             //提示登录成功
-            message.success('登录成功',2);
-            storageUtils.saveUser(result.data.data);//保存用户信息localStroage
-            memoryUtils.user = result.data.data //保存到内存
-            //跳转到/目录
-            this.props.history.replace('/');
+            if(type === 'user'){
+                storageUtils.saveUser(result.data.data);//保存用户信息localStroage
+                memoryUtils.user = result.data.data //保存到内存
+            }else if(type === 'staff'){
+                storageUtils.saveStaff(result.data.data);//保存用户信息localStroage
+                memoryUtils.staff = result.data.data //保存到内存
+            }else if(type === 'company'){
+                storageUtils.saveCompany(result.data.data);//保存用户信息localStroage
+                memoryUtils.company = result.data.data //保存到内存
+            }
+            if(!result.data.data[type+'Status']){
+                message.error("账号未激活");
+            }else{
+                message.success('登录成功',2);
+                if(type === 'user'){
+                    this.props.history.replace('/');
+                }else{
+                    this.props.history.replace('/'+type+'-manage');//跳转到/目录
+                }
+            }
         }else{
-            //登录失败
-            message.error(result.data.msg);
+            message.error("账号密码错误");
         }
     }
 
     render() {
-        //如果用户已经登录，自动跳转到admin
-        if(memoryUtils.user && memoryUtils.user._id){
-            return <Redirect to='/' />;
+        //如果已经登录，自动跳转
+        const type = this.props.match.params.type; //标志进来的方式
+        if(memoryUtils[type] && memoryUtils[type][type+'Status']){
+            return <Redirect to={`/${type}-manage`} />;
         }
         return (
             <div className='login'>
                 <header className='login-header'>
-                    <img src={logo} alt='logo' />
-                    <h1>React-balabala后台管理系统</h1>
+                    <h1>巴拉巴拉{paramToText[type]}登录</h1>
                 </header>
                 <section className='login-content'>
-                    <h3>用户登录</h3>
+                    <h3>{paramToText[type]}登录</h3>
                     <Form
                         name="normal_login"
                         className="login-form"
@@ -52,7 +77,7 @@ class Login extends Component{
                         onFinish={this.formOnFinish}
                     >
                         <Form.Item
-                            name="username"
+                            name="name"
                             rules={[
                                 {required: true, message: '请输入用户名！' },
                                 {min: 4, message:'用户名最小长度为4位！' },

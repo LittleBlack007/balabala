@@ -1,54 +1,74 @@
 import React from 'react';
-import {Upload, Button, message} from 'antd';
+import {Upload, Button, message, Image} from 'antd';
+import {updatePicUrl,reqLogin, reqCompanyLogin,reqStaffLogin} from '../../api/index';
+import memoryUtils from '../../utils/memoryUtils';
+import storageUtils from '../../utils/storageUtils';
 
 class ChangeImage extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-
+            imgUrl:'',
         };
     }
 
     /*file: 当前操作文件信息对象 fileList: 所有文件信息对象的数组 */
     handleChange = async ({ file, fileList }) => {
-        console.log('handleChange()', file, fileList)
-        // 如果上传图片完成 
-        if (file.status === 'done') {
-            const result = file.response
-            if (result.status === 0) {
-                message.success('上传成功了')
-                const { name, url } = result.data
-                file = fileList[fileList.length - 1]
-                file.name = name 
-                file.url = url
-            } else {
-                message.error('上传失败了')
-            }
-        } else if (file.status === 'removed') { // 删除图片 
-            //const result = await reqDeleteImg(file.name)
-            const result = {status:1} //未完善后端
-            if (result.status === 0) {
-                message.success('删除图片成功')
-            } else {
-                message.error('删除图片失败')
+        const {api} = this.props;
+        const type = api.match(/^\/[a-z]*/g)[0].substr(1); //截取地址第一个单词作为表示
+        if(file.status === "done"){
+            if(file.response.status === 'success'){
+                const {data} = file.response;
+                let typeImg = type+"Img";  //后端接受图片地址字段为xxxImg
+                const result = await updatePicUrl(api,{[typeImg]:data,id:memoryUtils[type].id});
+
+                if(result.data.status === 'success' && result.data.data === 1){
+                    let newOne;
+                    switch(type){
+                        case 'user':
+                            newOne = await reqLogin({userPetName:memoryUtils.user.userPetName,userPwd:memoryUtils.user.userPwd});
+                            storageUtils.saveUser(newOne.data.data); 
+                            break;
+                        case 'company':
+                            newOne = await reqCompanyLogin({companyPetName:memoryUtils.company.companyPetName,companyPwd:memoryUtils.company.companyPwd});
+                            storageUtils.saveCompany(newOne.data.data); 
+                            break;
+                        case 'staff':
+                            newOne = await reqStaffLogin({staffPetName:memoryUtils.staff.staffPetName,staffPwd:memoryUtils.staff.staffPwd});
+                            storageUtils.saveStaff(newOne.data.data); 
+                            break;
+                        default:
+                            
+                    }
+                    
+                    this.setState({imgUrl:data})
+                    message.success('修改成功');
+                }else{
+                    message.error('修改失败')
+                }
+            }else{
+                message.error("修改失败")
             }
         }
-        // 更新 fileList 状态 
-        this.setState({ fileList })
+    }
+
+    componentDidMount(){
+        this.setState({imgUrl:this.props.imgUrl})
     }
 
     render() {
         return (
             <div style={{margin:'15px 0px',textAlign:'center'}}>
-                    <img alt='公司标志' src="http://www.jituwang.com/uploads/allimg/160226/257934-160226225P747.jpg" width='200px' height='200px' />
-                    <div>
+                    <img alt='图片'  src={this.state.imgUrl} width='200px' height='200px' />
+                    <div style={{marginTop:'10px'}}>
                         <Upload 
                             maxCount={1}
-                            action="/manage/img/upload" 
+                            action="http://localhost:8080/user/upload_pic" 
                             accept="image/*"
-                            name='imgs' //发到后台的文件参数名
+                            name='pic' //发到后台的文件参数名
                             //onPreview={this.handlePreview} 
-                            onChange={this.handleChange} 
+                            onChange={this.handleChange}
+                            showUploadList={false}
                         > 
                             <Button type='primary'>修改</Button> 
                         </Upload>

@@ -2,6 +2,8 @@ import React from 'react';
 import { Card, Comment, Tooltip, List, Input, Avatar, Form, Button } from 'antd';
 import moment from 'moment';
 import { StarTwoTone, StarOutlined, LikeOutlined, LikeTwoTone } from '@ant-design/icons';
+import memoryUtils from '../../../utils/memoryUtils';
+import {getPostUserById,getPostById} from '../../../api/index'
 
 const { TextArea } = Input;
 const postDetailData = '<p>123</p><p>321</p><ul><li><span style="font-size: 24px;">2222</span></li></ul><ol><li><span style="font-size: 24px;">21321</span></li></ol>'
@@ -69,33 +71,44 @@ class PostDetail extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            postData:{},
             comments: [],
             submitting: false,
             value: '',
         };
     }
 
+    async componentDidMount(){
+        const postId = this.props.match.params.postId
+        const result = await getPostUserById(parseInt(postId));
+        const contentData = await getPostById(parseInt(postId))
+        this.setState({postData:result.data.data,postContent:contentData.data.data.postContent})
+    }
+
     render() {
 
-        const { comments, submitting, value } = this.state;
+        const { postData ,postContent} = this.state;
 
         return (
+            
             <Card>
                 <h2 style={{ fontSize: 18, fontWeight: 'bold' }}>
-                    #装修问诊室#圈子营业了，专家团在线坐诊，助你轻松实现美好家
+                    {postData.post_title}
                 </h2>
                 <Comment
-                    avatar={personInfo.avatar}
-                    author={personInfo.author}
-                    datetime={personInfo.datetime}
+                    avatar={postData.user_img}
+                    author={postData.user_pet_name}
+                    datetime={moment(postData.post_lase_date).format('YYYY-mm-dd HH:mm:ss')}
                 />
-                <div dangerouslySetInnerHTML={{ __html: postDetailData }}></div>
+                <div dangerouslySetInnerHTML={{ __html: postContent }}></div>
+                {/* 点赞-收藏 */}
                 <div style={{ width: '100%', textAlign: 'center' }}>
                     <StarTwoTone twoToneColor='#FFD05A' style={{ fontSize: 50 }} />
                     <div style={{ width: 20, display: 'inline-block' }}></div>
                     <LikeTwoTone twoToneColor="#eb2f96" style={{ fontSize: 50 }} />
                 </div>
                 <div style={{ marginTop: 20 }}></div>
+
                 <List
                     className="comment-list"
                     header={`${data.length} 回复`}
@@ -118,16 +131,16 @@ class PostDetail extends React.Component {
                 <Comment
                     avatar={
                         <Avatar
-                            src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-                            alt="Han Solo"
+                            src={memoryUtils.user.userImg}
+                            alt={memoryUtils.user.userPetName}
                         />
                     }
                     content={
                         <Editor
-                            onChange={this.handleChange}
-                            onSubmit={this.handleSubmit}
-                            submitting={submitting}
-                            value={value}
+                            //onChange={this.handleChange}
+                            //onSubmit={this.handleSubmit}
+                            //submitting={submitting}
+                            //value={value}
                         />
                     }
                 />

@@ -1,6 +1,9 @@
 import React from 'react';
-import { Modal, Form, Input, Button, Select } from 'antd';
-import ChangeImage from '../../components/change-image'
+import { Modal, Form, Input, Button, Select, message } from 'antd';
+import ChangeImage from '../../components/change-image';
+import memoryUtils from '../../utils/memoryUtils';
+import storageUtils from '../../utils/storageUtils';
+import {reqStaffLogin,updateStaff} from '../../api';
 
 const {TextArea} = Input
 const { Option } = Select;
@@ -32,6 +35,7 @@ class EditorStaff extends React.Component {
         super(props);
         this.state = {
             modalVisible: false,
+            kindId:'',
             a: []
         };
         this.formRef = React.createRef();
@@ -49,12 +53,31 @@ class EditorStaff extends React.Component {
         this.setState({ modalVisible: false })
     };
 
-    onFinish = (values) => {
-        console.log('Received values of form: ', values);
+    onFinish = async values => {
+        values.id = memoryUtils.staff.id;
+        const result = await updateStaff(values);
+        if(result.data.status === "success"){
+            const newStaff = await reqStaffLogin({staffPetName:memoryUtils.staff.staffPetName,staffPwd:memoryUtils.staff.staffPwd});
+            storageUtils.saveStaff(newStaff.data.data); 
+            message.success('修改成功')
+            window.history.go("/staff-manage");
+        }
+        //console.log(this.formRef.current.getFieldValue('company_pet_name'))
     };
+    onChangePwd = async (values) => {
+        const newPwd = values.password
+        const result = await updateStaff({id:memoryUtils.staff.id,staffPwd:newPwd});
+        if(result.data.status === "success" && result.data.data === 1){
+            storageUtils.removeStaff(); 
+            message.success('修改成功')
+            window.history.go("/staff-manage");
+        }else{
+            message.error('修改失败')
+        }
+    }
 
     componentDidMount() {
-        const a = [{ key: '1', name: '设计师' }, { key: '2', name: '工人' }]
+        const a = [{ key: 1, name: '设计师' }, { key: 2, name: '工人' }]
         this.setState({ a: a })
     }
 
@@ -66,8 +89,9 @@ class EditorStaff extends React.Component {
                     个人编辑
                 </Button>
                 <Modal title="编辑个人资料" visible={modalVisible} onCancel={this.handleCancel} footer={null} width={'70%'}>
-                    <ChangeImage />
+                    <ChangeImage imgUrl={memoryUtils.staff.staffImg} api='/staff/update-staff' />
                     <Form
+                        initialValues={memoryUtils.staff}
                         {...formItemLayout}
                         ref={this.formRef}
                         name="register"
@@ -77,7 +101,7 @@ class EditorStaff extends React.Component {
                     >
                         <Form.Item
                             label='用户名'
-                            name="staff_pet_name"
+                            name="staffPetName"
                             rules={[
                                 { required: true, message: '请输入用户名！' },
                                 { min: 4, message: '用户名最小长度为4位！' },
@@ -85,21 +109,21 @@ class EditorStaff extends React.Component {
                                 { pattern: /^[A-Za-z1-9_]+$/, message: '用户名以数字，字母和下划线构成！' }
                             ]}
                         >
-                            <Input placeholder="用户名" />
+                            <Input placeholder="用户名" disabled/>
                         </Form.Item>
                         <Form.Item
-                            name='staff_kind'
+                            name='kindId'
                             label='职业'
                             rules={[
                                 { required: true, message: '请选择职业类型。' }
                             ]}
                         >
-                            <Select>
-                                {this.state.a ? this.state.a.map(item => (<Option key={item.key}>{item.name}</Option>)) : null}
+                            <Select >
+                                {this.state.a ? this.state.a.map(item => (<Option value={item.key}>{item.name}</Option>)) : null}
                             </Select>
                         </Form.Item>
                         <Form.Item
-                            name="staff_name"
+                            name="staffName"
                             label="真实姓名"
                             tooltip="What do you want others to call you?"
                             rules={[
@@ -114,7 +138,7 @@ class EditorStaff extends React.Component {
                         </Form.Item>
 
                         <Form.Item
-                            name="phone"
+                            name="staffPhone"
                             label="电话号码"
                             rules={[
                                 {
@@ -130,7 +154,7 @@ class EditorStaff extends React.Component {
                                 }}
                             />
                         </Form.Item>
-                        <Form.Item
+                        {/* <Form.Item
                             name="person_id"
                             label="身份证号码"
                             rules={[
@@ -146,32 +170,35 @@ class EditorStaff extends React.Component {
                                     width: '100%',
                                 }}
                             />
-                        </Form.Item>
-                        <Form.Item label="现住地址">
-                            <Input.Group compact>
+                        </Form.Item> */}
+                        {/* <Form.Item label="现住地址">
+                            <Input.Group compact> */}
                                 <Form.Item
-                                    name={['address', 'province']}
-                                    noStyle
+                                    label='省份'
+                                    name='staffProvince'
+                                    //noStyle
                                     rules={[
                                         { required: true, message: '请输入省份！' },
                                         { pattern: /^[\u4E00-\u9FA5]+$/, message: '请输入汉字！' }
                                     ]}
                                 >
-                                    <Input style={{ width: '10%' }} placeholder="省份" />
+                                    <Input style={{ width: '20%' }} placeholder="省份" />
                                 </Form.Item>
                                 <Form.Item
-                                    name={['address', 'city']}
-                                    noStyle
+                                    label = '城市'
+                                    name='staffCity'
+                                    //noStyle
                                     rules={[
                                         { required: true, message: '请输入城市！' },
                                         { pattern: /^[\u4E00-\u9FA5]+$/, message: '请输入汉字！' },
                                     ]}
                                 >
-                                    <Input style={{ width: '10%' }} placeholder="市" />
+                                    <Input style={{ width: '20%' }} placeholder="市" />
                                 </Form.Item>
                                 <Form.Item
-                                    name={['address', 'address']}
-                                    noStyle
+                                    name='staffAddress'
+                                    label='详细地址'
+                                    //noStyle
                                     rules={[
                                         { required: true, message: '请输入详细地址！' },
                                         { pattern: /^[\u4E00-\u9FA5A-Za-z0-9]+$/, message: '只允许出现文字，数字，英文！' },
@@ -179,11 +206,11 @@ class EditorStaff extends React.Component {
                                 >
                                     <Input style={{ width: '80%' }} placeholder="详细地址" />
                                 </Form.Item>
-                            </Input.Group>
-                        </Form.Item>
+                            {/* </Input.Group>
+                        </Form.Item> */}
                         <Form.Item
                             label="个人简介"
-                            name="person_profile"
+                            name="staffProfile"
                         // rules={[{ required: true }]}
                         // style={{ display: 'inline-block', width: 'calc(50% - 8px)' }}
                         >
@@ -195,7 +222,7 @@ class EditorStaff extends React.Component {
                             </Button>
                         </Form.Item>
                     </Form>
-                    <Form name="change_pwd" onFinish={this.onFinish} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
+                    <Form name="change_pwd" onFinish={this.onChangePwd} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
                     <Form.Item
                         name="password"
                         label="新密码"

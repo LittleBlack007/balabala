@@ -1,6 +1,8 @@
 import React from 'react';
-import {Card,Avatar, Button, Row, Col, Statistic} from 'antd';
-import {Link } from 'react-router-dom';
+import {Card,Avatar, Button, Row, Col, Statistic, Modal} from 'antd';
+import {Link, Redirect } from 'react-router-dom';
+import memoryUtils from '../../utils/memoryUtils';
+import storageUtils from '../../utils/storageUtils';
 import './index.less';
 import BarChart from '../../components/echarts/BarChart';
 import DrawerContain from './drawer-contain';
@@ -24,11 +26,25 @@ class CompanyManage extends React.Component {
         };
     }
 
-    logOut= () => {
-        window.history.go('')
+    logout = () => {
+        Modal.confirm({
+            content: '确定退出？',
+            okText:'确定',
+            cancelText:'取消',
+            onOk: () => {
+                storageUtils.removeCompany();
+                memoryUtils.company = {};
+                this.props.history.replace('/');
+            },
+            onCancel: () => {}
+        })
     }
 
     render() {
+        const company = memoryUtils.company;
+        if(!company.companyStatus){
+            return <Redirect to={"/login/company"} />
+        }
         return (
             <div>
                 <div style={{display:'flex',marginBottom:'20px',height:'60px',backgroundColor:'#1DA57A',color:'white',alignItems:'center',justifyContent:'space-between'}}>
@@ -37,12 +53,12 @@ class CompanyManage extends React.Component {
                     </div>
                     <div>
                         <Link  style={{color:'white'}} to='/company-manage'>
-                            <Avatar src='http://www.jituwang.com/uploads/allimg/160226/257934-160226225P747.jpg' />&nbsp;
+                            <Avatar src={company.companyImg} />&nbsp;
                             平行空间家装
                         </Link>&nbsp;&nbsp;&nbsp;
                         <Link to='/' style={{color:'white'}}>平台首页</Link>
                         <AddStaff />
-                        <Button type='link' onClick={this.logOut}>
+                        <Button type='link' onClick={this.logout}>
                             <Link to='/' style={{color:'white'}}>退出</Link>
                         </Button>
                     </div>

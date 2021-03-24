@@ -1,7 +1,7 @@
 import React from 'react';
 import { Menu } from 'antd';
 import { MailOutlined, AppstoreOutlined, SettingOutlined } from '@ant-design/icons';
-
+//目前没应用上的文件
 import './index.less';
 
 const {SubMenu} = Menu;

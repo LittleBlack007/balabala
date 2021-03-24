@@ -1,9 +1,11 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Button, Avatar, Row, Col, Card, Statistic, Tooltip, Table, Switch, Pagination, Collapse, Comment, List } from 'antd';
+import { Link, Redirect } from 'react-router-dom';
+import { Button, Avatar, Row, Col, Card, Statistic, Tooltip, Table, Switch, Pagination, Collapse, Comment, List, Modal } from 'antd';
 import moment from 'momnet';
 import AddCaseForm from './add-case-form';
 import EditorStaff from './editor-staff';
+import memoryUtils from '../../utils/memoryUtils';
+import storageUtils from '../../utils/storageUtils';
 
 const { Panel } = Collapse;
 const anlidata = [
@@ -257,9 +259,27 @@ class StaffCenter extends React.Component {
         this.setState({ [type]: key });
     };
 
+    logout = () => {
+        Modal.confirm({
+            content: '确定退出？',
+            okText:'确定',
+            cancelText:'取消',
+            onOk: () => {
+                storageUtils.removeStaff();
+                memoryUtils.staff = {};
+                this.props.history.replace('/');
+            },
+            onCancel: () => {}
+        })
+    }
+
 
 
     render() {
+        const staff = memoryUtils.staff;
+        if(!staff.staffStatus){
+            return <Redirect to={"/login/staff"} />
+        }
         return (
             <div>
                 <div style={{ display: 'flex', marginBottom: '20px', height: '60px', backgroundColor: '#1DA57A', color: 'white', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -268,8 +288,8 @@ class StaffCenter extends React.Component {
                     </div>
                     <div>
                         <Link to='/' style={{ color: 'white' }}>平台首页</Link>
-                        <Button type='link' onClick={this.logOut}>
-                            <Link to='/' style={{ color: 'white' }}>退出</Link>
+                        <Button type='link' onClick={this.logout} style={{ color: 'white' }}>
+                            退出
                         </Button>
                     </div>
                 </div>
@@ -278,19 +298,19 @@ class StaffCenter extends React.Component {
                         <Card
                             actions={[
                                 <AddCaseForm buttonName='创建案例' />,
-                                (<EditorStaff />),
+                                <EditorStaff />, //编辑员工信息
                             ]}
                         >
                             <Meta
-                                avatar={<Avatar size={64} src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
-                                title="王巴拉"
-                                description="中国室内装饰协会会员，毕业于郑州轻工业学院。擅长风格：新中式、北欧、美式田园、现代简约风格"
+                                avatar={<Avatar size={64} src={staff.staffImg} />}
+                                title={staff.staffName}
+                                description={staff.staffProfile}
                             />
                         </Card>
-                        <Card style={{ marginTop: '20px' }}>
+                        <Card style={{ marginTop: '20px',backgroundColor:'#FFA58B' }}>
                             <Statistic title="订单总收入(￥)" value={112893} precision={2} />
                         </Card>
-                        <Card style={{ marginTop: '20px' }}>
+                        <Card style={{ marginTop: '20px',backgroundColor:'#A1B2A8' }}>
                             <Statistic title="订单数" value={112893} precision={0} />
                         </Card>
                     </Col>

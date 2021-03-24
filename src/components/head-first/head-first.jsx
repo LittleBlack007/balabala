@@ -1,13 +1,15 @@
-import { Button, Badge } from 'antd';
+import { Button, Badge, Select } from 'antd';
 import React from 'react';
 import {MessageOutlined} from '@ant-design/icons'
 import { Link, withRouter } from 'react-router-dom';
 import './index.less';
+import memoryUtils from '../../utils/memoryUtils';
 
+const {Option} = Select;
 const navList = [
-    { path: '/user', text: '个人中心' },
-    { path: '/company-manage', text: '商家中心' },
-    { path: '/staff-center', text: '工人中心' },
+    { path: '/user-manage', text: '个人中心' },
+    { path: '/company-manage', text: '公司中心' },
+    { path: '/staff-manage', text: '工人中心' },
     { path: '/forum', text: '我的论坛' }
 ]
 const HeadFirstNav = (props) => {
@@ -39,8 +41,10 @@ class HeadFirst extends React.Component {
                     </div>
                 <div className='head-first-right'>
                     <div style={{ float: 'left' }}>
-                        <Link>登录 </Link>
-                        <Link>&nbsp;&nbsp;注册&nbsp;&nbsp;</Link>
+                    {memoryUtils.user && memoryUtils.user.userStatus
+                        ?<Button type='link'><Link to="/user-manage">{memoryUtils.user.userPetName}</Link></Button>
+                        :<Link to="/login/user">登录&nbsp;&nbsp;</Link>
+                    }
                     </div>
                     <div style={{ float: 'left' ,margin:'0px 4 px'}}>
                         <Badge count={5} size="small" offset={[18, 7]} >

@@ -4,6 +4,7 @@ import CompanyManage from './pages/company-manage';
 import Main from '../src/pages/main'
 import StaffCenter from './pages/staff';
 import User from './pages/user';
+import Login from './pages/login';
 
 class App extends Component {
   constructor(props){
@@ -17,8 +18,9 @@ class App extends Component {
     return(
       <BrowserRouter>
         <Switch>
-          <Route path="/user" component={User} / >
-          <Route path='/staff-center' component={StaffCenter} />
+          <Route path="/login/:type" component={Login} />
+          <Route path="/user-manage" component={User} / >
+          <Route path='/staff-manage' component={StaffCenter} />
           <Route path='/company-manage' component={CompanyManage} />
           <Route path='/' component={Main} />
         </Switch>
