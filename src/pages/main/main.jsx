@@ -28,7 +28,7 @@ class Main extends React.Component {
                 <Layout>
                     <Header className='header'>
                         <Link to='/balabala'><img style={{height:66}} src={balaIndex} alt='主页' /></Link>
-                        <Input 
+                        {/* <Input 
                             style={{width:300}}
                             addonBefore={
                                 <Select defaultValue='company' className='select-before'>
@@ -37,14 +37,14 @@ class Main extends React.Component {
                                 </Select>} 
                             addonAfter={<Button type='link' size='small' className='select-after'>搜索</Button>} 
                             placeholder="输入公司/个人名" 
-                        />
+                        /> */}
                     </Header>
                     <Content>
                         <Switch>
-                            <Route path='/balabala/add-order/:staffId' component={AddOrder} />
-                            <Route path='/balabala/staff' component={StaffDisplay} />
-                            <Route path='/balabala/company-display/case' component={CaseDisplay} />
-                            <Route path='/balabala/company-display' component={CompanyDisplay} />
+                            <Route path='/balabala/add-order/:staffId/:companyId' component={AddOrder} />
+                            <Route path='/balabala/staff/:staffId' component={StaffDisplay} />
+                            <Route path='/balabala/company-display/case/:caseId' component={CaseDisplay} />
+                            <Route path='/balabala/company-display/:companyId' component={CompanyDisplay} />
                             <Route path='/balabala' component={Balabala}/>
                             <Route path='/forum' component={Forum} />
                             <Redirect to='/balabala' />

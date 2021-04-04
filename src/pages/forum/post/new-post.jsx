@@ -33,11 +33,14 @@ class PostForum extends React.Component {
         value.userId = memoryUtils.user.id;
         value.postContent=this.editor.current.getDetail()
         value.postLastDate = moment().format(dateFormat);
-        console.log(value)
+        value.poseViewed = 0;
+        value.postComNum = 0;
+        value.postPosition = 0;
+        value.postLikesNum = 0;
         const result = await creatPost(value);
         if(result.data && result.data.status ==='success' && result.data.data){
             message.success("成功");
-            window.history.go('/forum-index')
+            this.props.history.push('/forum/forum-index')
         }else{
             message.error("失败");
         }

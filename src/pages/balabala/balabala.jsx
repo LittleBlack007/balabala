@@ -1,23 +1,38 @@
 import React from 'react';
-import { Card, Select, Button, Rate, Row, Col, Carousel } from 'antd';
+import { Card, Select, Pagination, Rate, Row, Col, Carousel, Input } from 'antd';
 import { Link } from 'react-router-dom';
 import HD1 from '../../assets/images/huodong1.jpg';
 import HD2 from '../../assets/images/huodong2.jpg';
 import HD3 from '../../assets/images/huodong3.jpg';
+import {getAdvertisements,getGoddCompany,getCompany,getGoodStaff} from '../../api/index';
 
 
 const contentStyle ={height:362,width:'100%'}
 const { Option } = Select;
 const { Meta } = Card;
 const data = [
-    { name: '巴拉巴拉官方装修公司', rate: 3.5, rateTotal: 99999 },
-    { name: '巴拉巴拉官方装修公司', rate: 3.5, rateTotal: 99999 },
-    { name: '巴拉巴拉官方装修公司', rate: 3.5, rateTotal: 99999 },
-    { name: '巴拉巴拉官方装修公司', rate: 3.5, rateTotal: 99999 },
-    { name: '巴拉巴拉官方装修公司', rate: 3.5, rateTotal: 99999 },
-    { name: '巴拉巴拉官方装修公司', rate: 3.5, rateTotal: 99999 },
-    { name: '巴拉巴拉官方装修公司', rate: 3.5, rateTotal: 99999 },
-    { name: '巴拉巴拉官方装修公司', rate: 3.5, rateTotal: 99999 },
+    { name: '巧妙装修', rate: 5, rateTotal: 9999 },
+    { name: '工匠大师', rate: 4.5, rateTotal: 8999 },
+    { name: '极度设计', rate: 4.0, rateTotal: 7999 },
+    { name: '精装装饰', rate: 3.5, rateTotal: 6999 },
+    { name: '超级施工', rate: 3.5, rateTotal: 5999 },
+    { name: '小马施工', rate: 3.5, rateTotal: 4999 },
+    { name: '蚂蚁建房', rate: 3, rateTotal: 3999 },
+    { name: '蜜蜂基建', rate: 2.5, rateTotal: 2999 },
+]
+
+const data1 = [
+    { name: '张三', rate: 5, rateTotal: 99 },
+    { name: '李师', rate: 4.5, rateTotal: 89 },
+    { name: '王屋', rate: 4.0, rateTotal: 79 },
+    { name: '陈建', rate: 3.5, rateTotal: 69 },
+]
+
+const data2 = [
+    { name: '郑居', rate: 3.5, rateTotal: 59 },
+    { name: '李超', rate: 3.5, rateTotal: 49 },
+    { name: '孙峰', rate: 3, rateTotal: 39 },
+    { name: '梁工', rate: 2.5, rateTotal: 29 },
 ]
 
 
@@ -26,93 +41,206 @@ class Balabala extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-
+            ad:[],
+            companyType:'order',
+            staffType:'order',
+            companyListData:null,
+            staffListData:null,
+            companyName:'',
+            staffCity:'',
+            companySearchType:'',
         };
     }
 
+    async componentDidMount(){
+        this.getAd();
+        this.getGoodCompanyList();
+        this.getGoodStaffList()
+    }
+    getAd = async () => {
+        const result = await getAdvertisements();
+        this.setState({ad:result.data.data.list})
+    } 
+    getGoodCompanyList = async ()=> {
+        const result = await getGoddCompany();
+        this.setState({companyListData:result.data.data})
+    }
+    getGoodStaffList = async ()=> {
+        const result = await getGoodStaff();
+        this.setState({staffListData:result.data.data})
+    }
+    getCompanyList = async ()=> {
+        const result = await getCompany();
+        this.setState({companyListData:result.data.data})
+    }
+    onCompanyChange =async value => {
+        if(value === 'order'){
+            const result = await getGoddCompany();
+            this.setState({companyListData:result.data.data,companyType:'order'})
+        }else{
+            const result = await getGoddCompany(1,1);
+            this.setState({companyListData:result.data.data,companyType:'rated'})
+        }
+    }
+    onStaffChange =async value => {
+        if(value === 'order'){
+            const result = await getGoodStaff();
+            this.setState({staffListData:result.data.data,staffType:'order'})
+        }else{
+            const result = await getGoodStaff(1,1);
+            this.setState({staffListData:result.data.data,staffType:'rated'})
+        }
+    }
+    onCompanySearch= async value => {
+        const {companyType} = this.state;
+        if(companyType=== 'order'){
+            const result = await getGoddCompany(1,null,value);
+            this.setState({companyListData:result.data.data,companyName:value})
+        }else{
+            const result = await getGoddCompany(1,1,value);
+            this.setState({companyListData:result.data.data,companyName:value})
+        }
+    }
+    onStaffSearch= async value => {
+        const {staffType} = this.state;
+        if(staffType=== 'order'){
+            const result = await getGoodStaff(1,null,value);
+            this.setState({staffListData:result.data.data,staffCity:value})
+        }else{
+            const result = await getGoodStaff(1,1,value);
+            this.setState({staffListData:result.data.data,staffCity:value})
+        }
+    }
+    onComPageChange = async value => {
+        const {companyType,companyName,} = this.state;
+        if(companyType=== 'order'){
+            const result = await getGoddCompany(value,null,companyName);
+            this.setState({companyListData:result.data.data})
+        }else{
+            const result = await getGoddCompany(value,1,companyName);
+            this.setState({companyListData:result.data.data})
+        }
+    }
+    onStaffPageChange = async value => {
+        const {staffType,staffCity} = this.state;
+        if(staffType=== 'order'){
+            const result = await getGoodStaff(value,null,staffCity);
+            this.setState({staffListData:result.data.data})
+        }else{
+            const result = await getGoodStaff(value,1,staffCity);
+            this.setState({staffListData:result.data.data})
+        }
+    }
+    onCompanySearchChange = value => {
+        if(value==='companyName'){
+            this.setState({companySearchType:'',companyName:value});
+        }else{
+            this.setState({companySearchType:value,companyName:''});
+        }
+        
+    }
+
     render() {
+        const {companyListData,companyType,staffType,staffListData} = this.state;
         return (
             <Card bodyStyle={{padding:0}}>
                 <Carousel autoplay>
-                    <div><img style={contentStyle} src={HD1} alt='活动1' /></div>
-                    <div><img style={contentStyle} src={HD2} alt='活动2' /></div>
-                    <div><img style={contentStyle} src={HD3} alt='活动3' /></div>
+                    {this.state.ad.length>=1
+                        ?this.state.ad.map(item => 
+                            <a href={item.adUrl}>
+                                <img style={contentStyle} src={item.adPicture} alt={item.adTitle} />
+                            </a>)
+                        :<div><img style={contentStyle} src={HD1} alt='广告' /></div>
+                    }
                 </Carousel>
                 <Card
                     style={{ marginTop: '16px' }}
                     bordered={false}
                     title={<span style={{ fontWeight: 500, fontSize: '18px' }}>装修公司</span>}
                     extra={<>
-                        <Select defaultValue='most-praise' bordered={false}>
-                            <Option value='most-praise' >好评最多</Option>
-                            <Option value='most-order' >订单最多</Option>
+                        <Select defaultValue='order' bordered={false} onChange={this.onCompanyChange}>
+                            <Option value='rated' >好评最多</Option>
+                            <Option value='order' >订单最多</Option>
                         </Select>
-                        <Button size='middle' type='link'>查看更多</Button>
+                        {/* <Select defaultValue='companyCity' bordered={false} onChange={this.onCompanySearchChange}>
+                            <Option value='companyName' >按名字</Option>
+                            <Option value='companyCity' >按地区</Option>
+                        </Select> */}
+                        <Input.Search placeholder='按名字搜索' style={{width:'200px'}} onSearch={this.onCompanySearch}/>
                     </>}
                 >
-                    <Row gutter={16}>
-                        {
-                            data.map(item => (
-                                <Link to='/balabala/company-display'>
+                    <Row gutter={16} style={{marginBottom:'20px'}}>
+                        {companyListData && companyListData.list?
+                           companyListData.list.map(item => (
+                                <Link to={`/balabala/company-display/${item.id}`}>
                                     <Col sapn={6} style={{ marginTop: 16 }}>
                                         <Card
                                             hoverable
                                             style={{ width: 290, }}
-                                            cover={<img alt="example" style={{ height: 200 }} src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png" />}
+                                            cover={<img alt="example" style={{ height: 200 }} src={item.company_img} />}
                                         >
                                             <Meta
-                                                title={item.name}
+                                                title={item.company_name}
                                                 description={
                                                     <div style={{ fontSize: 14, color: '#999' }}>
-                                                        <Rate count={5} defaultValue={item.rate} disabled allowHalf />
-                                                        <span> {item.rateTotal} 条评价</span>
+                                                        {/* <Rate count={5} defaultValue={item.rate} disabled allowHalf /> */}
+                                                        {companyType === 'order'
+                                                            ?<span>共{item.total}个订单</span>
+                                                            :<span>{item.total}个好评</span>
+                                                        }
                                                     </div>
                                                 }
                                             />
                                         </Card>
                                     </Col>
                                 </Link>
-                            ))
+                            )):null
                         }
+                        
                     </Row>
+                    {companyListData?<Pagination pageSize={companyListData.pageSize} onChange={this.onComPageChange} total={companyListData.total} />:null}
                 </Card>
                 <Card
                     style={{ marginTop: '16px' }}
                     bordered={false}
                     title={<span style={{ fontWeight: 500, fontSize: '18px' }}>施工人员</span>}
                     extra={<>
-                        <Select defaultValue='most-praise' bordered={false}>
-                            <Option value='most-praise' >好评最多</Option>
-                            <Option value='most-order' >订单最多</Option>
+                        <Select defaultValue='order' bordered={false} onChange={this.onStaffChange}>
+                            <Option value='rated' >好评最多</Option>
+                            <Option value='order' >订单最多</Option>
                         </Select>
-                        <Button size='middle' type='link'>查看更多</Button>
+                        <Input.Search placeholder='按地区搜索' style={{width:'200px'}} onSearch={this.onStaffSearch}/>
                     </>}
                 >
                     <Row gutter={16}>
-                        {
-                            data.map(item => (
-                                <Link to='/balabala/company-display'>
+                        {staffListData && staffListData.list ?
+                            staffListData.list.map((item,index) => (
+                                <Link to={`/balabala/staff/${item.id}`}>
                                     <Col sapn={6} style={{ marginTop: 16 }}>
                                         <Card
                                             hoverable
                                             style={{ width: 290, }}
-                                            cover={<img alt="example" style={{ height: 200 }} src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png" />}
+                                            cover={<img alt="example" style={{ height: 200 }} src={item.staff_img} />}
                                         >
                                             <Meta
-                                                title={item.name}
+                                                title={item.staff_name}
                                                 description={
                                                     <div style={{ fontSize: 14, color: '#999' }}>
-                                                        <Rate count={5} defaultValue={item.rate} disabled allowHalf />
-                                                        <span> {item.rateTotal} 条评价</span>
+                                                        {/* <Rate count={5} defaultValue={item.rate} disabled allowHalf /> */}
+                                                        {staffType==='order'
+                                                            ?<span> 共{item.total} 个订单</span>
+                                                            :<span> {item.total} 个好评</span>   
+                                                        }
                                                     </div>
                                                 }
                                             />
                                         </Card>
                                     </Col>
                                 </Link>
-                            ))
+                            )):null
                         }
                     </Row>
+                    {staffListData?<Pagination pageSize={staffListData.pageSize} onChange={this.onStaffPageChange} total={staffListData.total} />:null}
                 </Card>
             </Card>
         )

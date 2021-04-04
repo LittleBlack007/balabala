@@ -5,7 +5,7 @@ import {Link} from 'react-router-dom';
 const dataSource = [
     {
         case_id: '112312312312',
-        show: 'http://www.jituwang.com/uploads/allimg/160226/257934-160226225P747.jpg',
+        show: 'https://tgi13.jia.com/125/007/25007599.jpg',
         case_title: '已完成',
         staff_name:10000,
         case_type:'普通住宅',
@@ -14,7 +14,7 @@ const dataSource = [
     },
     {
         case_id: '112312312312',
-        show: 'http://www.jituwang.com/uploads/allimg/160226/257934-160226225P747.jpg',
+        show: 'https://tgi1.jia.com/124/997/24997310.jpg',
         case_title: '已完成',
         staff_name:10000,
         case_type:'普通住宅',
@@ -51,7 +51,7 @@ const columns = [
         title: '展示',
         dataIndex: 'show',
         key: 'show',
-        render: show => (<img src={show} alt='展示图片' width={200} height={200} />)
+        render: show => (<img src={show} alt='展示图片' style={{width:'200px' ,height:'120px'}} />)
     },
     {
         title: '案例标题',

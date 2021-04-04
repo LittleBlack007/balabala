@@ -1,6 +1,9 @@
 import React from 'react';
-import { Modal, Form, Input, Button, Select, Card,InputNumber } from 'antd';
+import { Modal, Form, Input, Button, Select, Card,InputNumber, message } from 'antd';
 import moment from 'momnet';
+import memoryUtils from '../../utils/memoryUtils';
+import {Redirect} from 'react-router-dom';
+import { addOrder } from '../../api';
 
 const { TextArea } = Input
 const { Option } = Select;
@@ -47,14 +50,33 @@ class AddOrderForm extends React.Component {
         this.setState({ modalVisible: false })
     };
 
-    onFinish = (values) => {
-        console.log('Received values of form: ', values);
+    onFinish = async (values) => {
+        const userId = memoryUtils.user.id
+        const {staffId,companyId} = this.props.match.params
+        values.userId = userId;
+        values.companyId = companyId;
+        values.staffId = staffId;
+        values.orderStatus = 0
+        values.orderRateStatus = 0
+        values.orderCreateTime =moment().format('yyyy-MM-DD HH:mm:ss')
+        const result = await addOrder(values);
+        if(result.data && result.data.data>0){
+            message.success('创建成功')
+            this.props.history.push(`/balabala/staff/${staffId}`)
+        }else{
+            message.error('创建失败')
+        }
     };
 
-    componentDidMount() {
+    async componentDidMount() {
+        
     }
 
     render() {
+        const user = memoryUtils.user;
+        if(!user.userStatus){
+            return <Redirect to='/login/user'/>
+        }
         return (
             <Card>
                 <Form
@@ -75,14 +97,14 @@ class AddOrderForm extends React.Component {
                         <InputNumber 
                             style={{width:'35%'}}
                             formatter={value => `￥ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                            parser={value => value.replace(/\$\s?|(,*)/g, '')}
+                            parser={value => value.replace(/\￥\s?|(,*)/g, '')}
                         />
                     </Form.Item>
                     <Form.Item
                         name='orderType'
                         label='订单类型'
                         rules={[
-                            { required: true, message: '请选择职业类型。' }
+                            { required: true, message: '请选择订单类型。' }
                         ]}
                     >
                         <Select placeholder="请选择订单类型" style={{width:'20%'}}>

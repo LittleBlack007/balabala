@@ -1,7 +1,10 @@
 import React from 'react';
-import { Form, Button, Input, Card } from 'antd';
+import { Form, Button, Input, Card, Upload, Select,message } from 'antd';
 import './register.less';
+import moment from 'momnet';
+import {registerUser} from '../../api/index';
 
+const {Option} = Select;
 const formItemLayout = {
     labelCol: {
         xs: { span: 24 },
@@ -29,8 +32,27 @@ class UserResgister extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-
+            avatarUrl:'http://balabala-1300823189.cos.ap-guangzhou.myqcloud.com/balabala/images/360wallpaper_dt16164569544041881695277306635362.jpg',
         };
+    }
+
+    onFinish = async values => {
+        values.userImg = this.state.avatarUrl
+        values.userCtime = moment().format('YYYY-MM-DD HH:mm:ss');
+        values.userStatus = 1;
+        console.log(values)
+        const result = await registerUser(values);
+        if(result.status === 200){
+            if(result.data && result.data.status==='success' && result.data.data>0){
+                message.success("注册成功");
+                message.success("等待审批",3);
+                this.props.history.replace('/login/user')
+            }else{
+                message.error("账号已经存在！")
+            }
+        }else{
+            message.error("注册失败")
+        }
     }
 
     render() {
@@ -45,9 +67,32 @@ class UserResgister extends React.Component {
                     ref={this.formRef}
                     name="register"
                     onFinish={this.onFinish}
-                    initialValues={this.props.user}
                     scrollToFirstError
                 >
+                    <Form.Item
+                        label='头像'
+                        name='userImg'
+                    >
+                        <Upload 
+                            maxCount={1}
+                            action="http://localhost:8080/user/upload_pic" 
+                            accept="image/*"
+                            listType="picture-card"
+                            name='pic' //发到后台的文件参数名
+                            //onPreview={this.handlePreview} 
+                            onChange={({ file, fileList }) => {
+                                if(file.status === "done"){
+                                    if(file.response.status === 'success'){
+                                        const {data} = file.response;
+                                        this.setState({avatarUrl:data})
+                                    }
+                                }
+                            }}
+                            showUploadList={true}
+                        > 
+                            <Button type='link'>上传头像</Button> 
+                        </Upload>
+                    </Form.Item>
                     <Form.Item
                         label='用户名'
                         name="userPetName"
@@ -58,7 +103,42 @@ class UserResgister extends React.Component {
                             { pattern: /^[A-Za-z1-9_]+$/, message: '用户名以数字，字母和下划线构成！' }
                         ]}
                     >
-                        <Input disabled={true} />
+                        <Input  style={{ width: '30%' }}/>
+                    </Form.Item>
+                    <Form.Item
+                        name="userPwd"
+                        label="密码"
+                        rules={[
+                            {
+                                required: true,
+                                message: 'Please input your password!',
+                            },
+                        ]}
+                        hasFeedback
+                    >
+                        <Input.Password style={{ width: '30%' }} type="password" placeholder="密码" />
+                    </Form.Item>
+                    <Form.Item
+                        name="confirm"
+                        label="确认密码"
+                        dependencies={['userPwd']}
+                        hasFeedback
+                        rules={[
+                            {
+                                required: true,
+                                message: 'Please confirm your password!',
+                            },
+                            ({ getFieldValue }) => ({
+                                validator(_, value) {
+                                    if (!value || getFieldValue('userPwd') === value) {
+                                        return Promise.resolve();
+                                    }
+                                    return Promise.reject(new Error('两个密码不一致'));
+                                },
+                            }),
+                        ]}
+                    >
+                        <Input.Password style={{ width: '30%' }} />
                     </Form.Item>
                     <Form.Item
                         name="userName"
@@ -72,9 +152,24 @@ class UserResgister extends React.Component {
                             },
                         ]}
                     >
-                        <Input />
+                        <Input style={{ width: '30%' }}/>
                     </Form.Item>
-
+                    <Form.Item
+                        name="userSex"
+                        label="性别"
+                        rules={[
+                            {
+                                required: true,
+                                message: 'Please input your Sex!',
+                                whitespace: true,
+                            },
+                        ]}
+                    >
+                        <Select style={{width:'100px'}}>
+                            <Option value="man">男</Option>
+                            <Option value="women">女</Option>
+                        </Select>
+                    </Form.Item>
                     <Form.Item
                         name="userPhone"
                         label="电话号码"
@@ -87,9 +182,7 @@ class UserResgister extends React.Component {
                         ]}
                     >
                         <Input
-                            style={{
-                                width: '100%',
-                            }}
+                            style={{ width: '30%' }}
                         />
                     </Form.Item>
                     {/* <Form.Item
@@ -116,7 +209,6 @@ class UserResgister extends React.Component {
                         name='userProvince'
                         // noStyle
                         rules={[
-                            { required: true, message: '请输入省份！' },
                             { pattern: /^[\u4E00-\u9FA5]+$/, message: '请输入汉字！' }
                         ]}
                     >
@@ -127,7 +219,6 @@ class UserResgister extends React.Component {
                         label='显著城市'
                         // noStyle
                         rules={[
-                            { required: true, message: '请输入城市！' },
                             { pattern: /^[\u4E00-\u9FA5]+$/, message: '请输入汉字！' },
                         ]}
                     >
@@ -138,11 +229,10 @@ class UserResgister extends React.Component {
                         label='详细地址'
                         // noStyle
                         rules={[
-                            { required: true, message: '请输入详细地址！' },
                             { pattern: /^[\u4E00-\u9FA5A-Za-z0-9]+$/, message: '只允许出现文字，数字，英文！' },
                         ]}
                     >
-                        <Input style={{ width: '80%' }} placeholder="详细地址" />
+                        <Input style={{ width: '70%' }} placeholder="详细地址" />
                     </Form.Item>
                     {/* </Input.Group>
                         </Form.Item> */}
@@ -156,7 +246,7 @@ class UserResgister extends React.Component {
                         </Form.Item> */}
                     <Form.Item {...tailFormItemLayout}>
                         <Button type="primary" htmlType="submit">
-                            确定修改
+                            注册
                             </Button>
                     </Form.Item>
                 </Form>

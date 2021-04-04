@@ -5,11 +5,11 @@ import {Link} from 'react-router-dom';
 const dataSource = [
     {
         staff_id: '112312312312',
-        staff_avtar: 'http://www.jituwang.com/uploads/allimg/160226/257934-160226225P747.jpg',
-        staff_name: '李四',
+        staff_avtar: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3427525504,764883345&fm=26&gp=0.jpg',
+        staff_name: '梁工',
         staff_pet_name:'ppp',
         staff_phone:'1231231231',
-        staff_kind:'设计师',
+        staff_kind:'防水工',
 
     },
     {
@@ -48,7 +48,7 @@ const columns = [
         title: '头像',
         dataIndex: 'staff_avtar',
         key: 'staff_avtar',
-        render: show => (<img src={show} alt='展示图片' width={200} height={200} />)
+        render: show => (<img src={show} alt='展示图片' style={{width:'200px' ,height:'120px'}} />)
     },
     {
         title: '名字',

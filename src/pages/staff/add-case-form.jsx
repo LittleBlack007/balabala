@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Form, Input, Button, Select,InputNumber } from 'antd';
+import { Modal, Form, Input, Button, Select,InputNumber, Upload } from 'antd';
 import RichTextEditor from '../../components/rich-text-editor'
 import ChangeImage from '../../components/change-image';
 
@@ -33,6 +33,7 @@ class AddCaseForm extends React.Component {
         super(props);
         this.state = {
             modalVisible: false,
+            imgUrl:'',
             a: []
         };
         this.formRef = React.createRef();
@@ -91,7 +92,25 @@ class AddCaseForm extends React.Component {
                                 { required: true, message: '请上传封面！' },
                             ]}
                         >
-                            <ChangeImage />
+                            <Upload
+                                maxCount={1}
+                                action="http://localhost:8080/user/upload_pic"
+                                accept="image/*"
+                                listType="picture-card"
+                                name='pic' //发到后台的文件参数名
+                                //onPreview={this.handlePreview} 
+                                onChange={({ file, fileList }) => {
+                                    if (file.status === "done") {
+                                        if (file.response.status === 'success') {
+                                            const { data } = file.response;
+                                            this.setState({ imgUrl: data })
+                                        }
+                                    }
+                                }}
+                                showUploadList={true}
+                            >
+                                <Button type='link'>上传封面</Button>
+                            </Upload>
                         </Form.Item>
                         <Form.Item
                             label='案例标题'
