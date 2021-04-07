@@ -65,8 +65,8 @@ class CaseDisplay extends React.Component {
                             <Col span={14}><img src={caseData.caseIndeximg} style={{ width: 480, height: 300 }} alt='封面图片' /></Col>
                             <Col span={10}>
                                 <p style={{ fontSize: 18, fontWeight: 'bold' }}>{caseData.caseTitle}</p>
-                                <p>面积：<Tag color='green'>{caseData.caseArea}<sup>2</sup></Tag></p>
-                                <p>造价：<span style={{ fontSize: 26, color: '#dd4848' }}>{caseData.caseBudget}</span></p>
+                                <p>面积：<Tag color='green'>{caseData.caseArea}m<sup>2</sup></Tag></p>
+                                <p>造价：<span style={{ fontSize: 26, color: '#dd4848' }}>{(caseData.caseBudget+'').replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span></p>
                                 <p>特点：
                                     <Tag color='pink'>{typeMap[caseData.caseType]}</Tag>
                                     <Tag color='pink'>{layoutMap[caseData.layoutId]}</Tag>

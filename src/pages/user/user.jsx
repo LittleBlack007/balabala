@@ -1,13 +1,13 @@
 import React from 'react';
 import { Link, Redirect } from 'react-router-dom';
-import { Button, Avatar, Row, Col, Card, Tooltip, Table, Modal } from 'antd';
+import { Button, Avatar, Row, Col, Card, Tooltip, Table, Modal, message } from 'antd';
 import EditorUser from './editor-user';
 import { EyeTwoTone } from '@ant-design/icons';
 import Column from 'antd/lib/table/Column';
 import NewRated from './new-rated';
 import memoryUtils from '../../utils/memoryUtils';
 import storageUtils from '../../utils/storageUtils';
-import {getOrderUserStaffByUSTS} from '../../api/index'
+import {getOrderUserStaffByUSTS,updateOrder,deleteOrder} from '../../api/index'
 import moment from 'momnet';
 import './index.less';
 
@@ -190,6 +190,8 @@ class StaffCenter extends React.Component {
 
     render() {
         const user = memoryUtils.user;
+        const userId = parseInt(user.id)
+        const {activeTabKey} = this.state;
         if(!user.userStatus){
             return <Redirect to='/login/user'/>
         }
@@ -285,7 +287,7 @@ class StaffCenter extends React.Component {
                                         title='订单状态'
                                         dataIndex='order_status'
                                         key='dwork_status'
-                                        render={text => text ===1?'进行中':'准备中'}
+                                        render={text => text ===1?'交付中':'准备中'}
                                     />:null}
                                     {this.state.activeTabKey === 'complete'?
                                     <Column title='评价' dataIndex='rate_grade' key='rated'
@@ -302,10 +304,58 @@ class StaffCenter extends React.Component {
                                         title='操作'
                                         key='daction'
                                         render={(text, record) => (<>
-                                        
-                                            <Button type='link' onClick={(record) => console.log(record)} disabled={record.status === '进行中' ? true : false}>取消订单</Button>
-                                            <Button type='link' onClick={() => console.log(record)} >确定完成</Button>
-                                            <NewRated order_id={record.id} disabled={record.order_rated_status===0?false:true} />
+                                            {this.state.activeTabKey === 'complete'
+                                                ?<NewRated 
+                                                    staffId={record.staff_id} orderId={record.id} rateId={record.rateId}
+                                                    getOrderData = {this.getOrderData} 
+                                                />
+                                                :<>
+                                                    <Button 
+                                                        type='link' 
+                                                        onClick={() => {
+                                                            Modal.confirm({
+                                                                content: '确定取消？',
+                                                                okText:'确定',
+                                                                cancelText:'取消',
+                                                                onOk: async () => {
+                                                                    const result = await deleteOrder(record.id)
+                                                                    if(result.data && result.data.data ===1){
+                                                                        message.success('成功取消')
+                                                                        this.getOrderData(1,userId,activeTabKey==='complete'?2:1)
+                                                                    }else{
+                                                                        message.success('取消失败')
+                                                                    }
+                                                                },
+                                                                onCancel: () => {}
+                                                            })
+                                                        }} 
+                                                        disabled={record.order_status === 1}>
+                                                            取消订单
+                                                    </Button>
+                                                    <Button 
+                                                        type='link' 
+                                                        onClick={()=>{
+                                                                Modal.confirm({
+                                                                    content: '确定完成？',
+                                                                    okText:'确定',
+                                                                    cancelText:'取消',
+                                                                    onOk: async () => {
+                                                                        const result = await updateOrder({id:record.id,orderStatus:2,orderEndTime:moment().format("YYYY-MM-DD HH:mm:ss")})
+                                                                        if(result.data && result.data.data ===1){
+                                                                            message.success('成功')
+                                                                            this.getOrderData(1,userId,activeTabKey==='complete'?2:1)
+                                                                        }else{
+                                                                            message.success('失败')
+                                                                        }
+                                                                    },
+                                                                    onCancel: () => {}
+                                                                })
+                                                        }} 
+                                                    >
+                                                        确定完成
+                                                    </Button>
+                                                </>
+                                            }
                                         </>)}
                                     />
                                 </Table>

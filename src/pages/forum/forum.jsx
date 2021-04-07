@@ -6,6 +6,7 @@ import NewPost from '../forum/post/new-post';
 import PostDetail from '../forum/post/post-detail';
 import ForumLeft from './forum-left/forum-left';
 import memoryUtils from '../../utils/memoryUtils';
+import {getAdvertisements} from '../../api/index';
 
 const colPhone = {
     xl: 24,
@@ -17,12 +18,17 @@ class Forum extends React.Component {
     constructor(props){
         super(props);
         this.state = {
+            ad:[],
         }
     }
 
     async componentDidMount(){
-        
+        this.getAd();
     }
+    getAd = async () => {
+        const result = await getAdvertisements();
+        this.setState({ad:result.data.data.list})
+    } 
 
     render(){
         const user = memoryUtils.user;
@@ -48,7 +54,16 @@ class Forum extends React.Component {
                             <p><Link to='/forum/user-info'>{user.userName}</Link></p>
                             <Button type='primary' block><Link to='/forum/post'>发布帖子</Link></Button>
                         </Card>
-                        <Card style={{height:200, marginTop:20}} bodyStyle={{textAlign:'center'}}>广告位招租</Card>
+                        {this.state.ad.length>=1
+                        ?this.state.ad.map(item => 
+                            <Card style={{height:200, marginTop:20}} bodyStyle={{textAlign:'center'}}>
+                                <img src={item.adPicture} alt={item.adTitle} style={{height:"180px",width:'360px'}} />
+                            </Card>)
+                        :<Card style={{height:200, marginTop:20}} bodyStyle={{textAlign:'center'}}>
+                            广告位招租
+                        </Card>
+                    }
+                        
                     </Col>
                 </Row>
             </div>

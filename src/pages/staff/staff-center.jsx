@@ -1,13 +1,19 @@
 import React from 'react';
 import { Link, Redirect } from 'react-router-dom';
-import { Button, Avatar, Row, Col, Card, Statistic, Tooltip, Table, Switch, Pagination, Collapse, Comment, List, Modal } from 'antd';
+import { Button, Avatar, Row, Col, Card, Statistic, Tooltip, Table, 
+    Switch, Pagination, Collapse, Comment, List, Modal,message } from 'antd';
 import moment from 'momnet';
+import {EyeTwoTone} from '@ant-design/icons'
 import AddCaseForm from './add-case-form';
 import EditorStaff from './editor-staff';
 import memoryUtils from '../../utils/memoryUtils';
 import storageUtils from '../../utils/storageUtils';
+import {updateOrder,getOrderUserStaffByUSTS,deleteOrder,getStaffRevenue,getStaffTotalOrderNum,
+    getCaseByStaffId} from '../../api/index';
+import NewRated from '../user/new-rated';
 
 const { Panel } = Collapse;
+const {Column} = Table
 const anlidata = [
     { name: '世纪花园', cost: '88万', area: 188 },
     { name: '世纪花园', cost: '88万', area: 188 },
@@ -106,11 +112,11 @@ const dataSource = {
 }
 const tabList = [
     {
-        key: 'doing',
+        key: 'incomplete',
         tab: '未完成',
     },
     {
-        key: 'finish',
+        key: 'complete',
         tab: '已完成',
     },
 ];
@@ -251,11 +257,47 @@ class StaffCenter extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            activeTabKey: 'doing'
+            caseData:{},
+            orderData:{},
+            revenue:'',
+            orderNum:'',
+            activeTabKey: 'incomplete'
         };
+    }
+    async componentDidMount(){
+        const staffId = parseInt(memoryUtils.staff.id)
+        //获取该用户未完成的订单
+        this.getOrderData(1,staffId,1);
+        this.getStaffRO(staffId);
+        this.getCaseData(1,staffId);
+    }
+    getCaseData = async (pageNum,staffId) => {
+        const result = await getCaseByStaffId(pageNum,staffId);
+        if(result.data && result.data.data){
+            this.setState({caseData:result.data.data})
+        }
+    } 
+    getStaffRO = async (staffId) => {
+        const r = await getStaffRevenue(staffId);
+        const n = await getStaffTotalOrderNum(staffId);
+        if(r.data && n.data && r.data.data && n.data.data){
+            this.setState({revenue:r.data.data,orderNum:n.data.data})
+        }
+    }
+    getOrderData = async (pageNum,staffId,orderStatus) => {
+        const result = await getOrderUserStaffByUSTS(pageNum,null,staffId,null,orderStatus);
+        if(result.data && result.data.data){
+            this.setState({orderData:result.data.data});
+        }
     }
 
     onTabChange = (key, type) => {
+        const staffId = parseInt(memoryUtils.staff.id)
+        if(key === 'incomplete'){
+            this.getOrderData(1,staffId,1)
+        }else{
+            this.getOrderData(1,staffId,2)
+        }
         this.setState({ [type]: key });
     };
 
@@ -280,6 +322,8 @@ class StaffCenter extends React.Component {
         if(!staff.staffStatus){
             return <Redirect to={"/login/staff"} />
         }
+        const staffId= parseInt(staff.id)
+        const {activeTabKey,revenue,orderNum} = this.state
         return (
             <div>
                 <div style={{ display: 'flex', marginBottom: '20px', height: '60px', backgroundColor: '#1DA57A', color: 'white', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -297,7 +341,7 @@ class StaffCenter extends React.Component {
                     <Col {...colPhone} xl={6}>
                         <Card
                             actions={[
-                                <AddCaseForm buttonName='创建案例' />,
+                                <AddCaseForm buttonName='创建案例' history={this.props.history} />,
                                 <EditorStaff />, //编辑员工信息
                             ]}
                         >
@@ -308,10 +352,10 @@ class StaffCenter extends React.Component {
                             />
                         </Card>
                         <Card style={{ marginTop: '20px',backgroundColor:'#FFA58B' }}>
-                            <Statistic title="订单总收入(￥)" value={112893} precision={2} />
+                            <Statistic title="订单总收入(￥)" value={revenue} precision={2} />
                         </Card>
                         <Card style={{ marginTop: '20px',backgroundColor:'#A1B2A8' }}>
-                            <Statistic title="订单数" value={112893} precision={0} />
+                            <Statistic title="订单数" value={orderNum} precision={0} />
                         </Card>
                     </Col>
                     <Col {...colPhone} xl={18}>
@@ -326,18 +370,156 @@ class StaffCenter extends React.Component {
                             }}
                         >
                             <Table
+                                style ={{width:'100%'}}
                                 rowKey={(record) => {
-                                    return (record.order_id || record.dorder_id + Date.now()) //在这里加上一个时间戳就可以了
+                                    return (record.id || record.id + Date.now()) //在这里加上一个时间戳就可以了
                                 }}
-                                dataSource={dataSource[this.state.activeTabKey]}
-                                columns={columns[this.state.activeTabKey]}
-                            // pagination={{ defaultPageSize: 2, total: 100 }}
-                            />
+                                dataSource={this.state.orderData.list}
+                                //columns={columns[this.state.activeTabKey]}
+                                pagination={{ 
+                                    total:this.state.orderData.total,
+                                    pageNum:this.state.orderData.pageNum,
+                                    pageSize:this.state.orderData.pageSize,
+                                    onChange: value => {
+                                        this.getOrderData(value,parseInt(staff.id),this.state.activeTabKey==='complete'?2:1)
+                                    }
+                                }}
+                                >
+                                    <Column title='订单ID' dataIndex='id' key='order_id' />
+                                    <Column title='用户id' dataIndex='user_id' key='user_id' className='no-show'/>
+                                    <Column title='员工id' dataIndex='staff_id' key='staff_id' className='no-show'/>
+                                    <Column title='用户名' dataIndex='user_name' key='staff_name' />
+                                    <Column title='联系电话' dataIndex='user_phone' key='user_phone'/>
+                                    <Column
+                                        title='佣金(￥)'
+                                        dataIndex='order_commission'
+                                        key='commission'
+                                        render = {text => `${text}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                    />
+                                    <Column
+                                        title='创建时间'
+                                        dataIndex='order_create_time'
+                                        key='start_date'
+                                        //ellipsis={true}
+                                        render={text => moment(text).format('YYYY-MM-DD HH:mm:ss')}
+                                    />
+                                    {this.state.activeTabKey === 'incomplete'?
+                                    <Column
+                                        title='更新时间'
+                                        dataIndex='order_update_time'
+                                        key='order_date'
+                                        //ellipsis={true}
+                                        render={text => moment(text).format('YYYY-MM-DD HH:mm:ss')}
+                                    />:null}
+                                    {this.state.activeTabKey === 'complete'
+                                    ?<Column
+                                        title='完成时间'
+                                        dataIndex='order_end_time'
+                                        key='order_end_date'
+                                        //ellipsis={true}
+                                        render={text => moment(text).format('YYYY-MM-DD HH:mm:ss')}
+                                    />:null}
+                                    <Column
+                                        //width={100}
+                                        title='工作内容'
+                                        dataIndex='order_content'
+                                        key='dwork_content'
+                                        render={text => {
+                                            return (<Tooltip title={text}><EyeTwoTone /></Tooltip>)
+                                        }}
+                                    />
+                                    <Column
+                                        //width={100}
+                                        title='工作地点'
+                                        dataIndex='order_address'
+                                        key='dwork_address'
+                                        render={text => {
+                                            return (<Tooltip title={text}><EyeTwoTone /></Tooltip>)
+                                        }}
+                                    />
+                                    {this.state.activeTabKey === 'incomplete'? 
+                                    <Column
+                                        width={100}
+                                        title='订单状态'
+                                        dataIndex='order_status'
+                                        key='dwork_status'
+                                        render={(text,row) => (
+                                            <Switch 
+                                                checkedChildren="交付中" 
+                                                unCheckedChildren="准备中" 
+                                                defaultChecked={text === 1 } 
+                                                onChange={async checked => {
+                                                    if(checked){
+                                                        const result = await updateOrder({id:row.id,orderStatus:1,orderUpdateTime:moment().format("YYYY-MM-DD HH:mm:ss")});
+                                                        if(result.data && result.data.data ===1){
+                                                            message.success('成功')
+                                                            this.getOrderData(1,staffId,activeTabKey==='complete'?2:1)
+                                                        }else{
+                                                            message.error('失败')
+                                                        }
+                                                    }else{
+                                                        const result = await updateOrder({id:row.id,orderStatus:0,orderUpdateTime:moment().format("YYYY-MM-DD HH:mm:ss")});
+                                                        if(result.data && result.data.data ===1){
+                                                            message.success('成功')
+                                                            this.getOrderData(1,staffId,activeTabKey==='complete'?2:1)
+                                                        }else{
+                                                            message.error('失败')
+                                                        }
+                                                    }
+                                                }} 
+                                            />
+                                        )}
+                                    />:null}
+                                    {this.state.activeTabKey === 'complete'?
+                                    <Column title='评价' dataIndex='rate_grade' key='rated'
+                                        render = {(rated) => {
+                                            let text = '无';
+                                            if (rated === 1) {text = '好评'; }
+                                            else if (rated === 2) {text = '中评'; }
+                                            else if (rated === 3) {text = '差评'; }
+                                            else {text = '未评价'; }
+                                            return <span>{text}</span>
+                                        }}
+                                    />:null}
+                                    <Column
+                                        title='操作'
+                                        key='daction'
+                                        render={(text, record) => (<>
+                                            {this.state.activeTabKey === 'complete'
+                                                ?<NewRated rateId={record.rateId} type='staff'  />
+                                                :<>
+                                                    <Button 
+                                                        type='link' 
+                                                        onClick={() => {
+                                                            Modal.confirm({
+                                                                content: '确定取消？',
+                                                                okText:'确定',
+                                                                cancelText:'取消',
+                                                                onOk: async () => {
+                                                                    const result = await deleteOrder(record.id)
+                                                                    if(result.data && result.data.data ===1){
+                                                                        message.success('成功取消')
+                                                                        this.getOrderData(1,staffId,activeTabKey==='complete'?2:1)
+                                                                    }else{
+                                                                        message.success('取消失败')
+                                                                    }
+                                                                },
+                                                                onCancel: () => {}
+                                                            })
+                                                        }} 
+                                                        disabled={record.order_status === 1}>
+                                                            取消订单
+                                                    </Button>
+                                                </>
+                                            }
+                                        </>)}
+                                    />
+                                </Table>
                         </Card>
                     </Col>
                 </Row>
-                <Collapse defaultActiveKey={['1']}  style={{margin:'20px 20px'}}>
-                    <Panel header="业主评价" key="1">
+                <Collapse defaultActiveKey={['2']}  style={{margin:'20px 20px'}}>
+                    {/* <Panel header="业主评价" key="1">
                     <List
                     className="comment-list"
                     header={`${data.length} 条评价`}
@@ -356,34 +538,42 @@ class StaffCenter extends React.Component {
                         </li>
                     )}
                 />
-                    </Panel>
+                    </Panel> */}
                     <Panel header="个人案例" key="2">
                         <Row gutter={16}>
-                            {
-                                anlidata.map(item => (
-                                    <Link to='/balabala/company-display/case'>
+                            {this.state.caseData.list && this.state.caseData.list.length > 0?
+                                this.state.caseData.list.map(item => (
+                                    <Link to={`/balabala/company-display/case/${item.id}`}>
                                         <Col style={{ marginTop: 16 }}>
                                             <Card
                                                 hoverable
                                                 style={{ width: 290, }}
-                                                cover={<img alt="example" style={{ height: 200 }} src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png" />}
+                                                cover={<img alt="example" style={{ height: 200 }} src={item.caseIndeximg} />}
                                             >
                                                 <Meta
-                                                    title={item.name}
+                                                    title={item.caseTitle}
                                                     description={
                                                         <div style={{ fontSize: 14, color: '#999' }}>
-                                                            <span> {item.cost} | {item.area}m<sup>2</sup></span>
+                                                            <span> 预算{item.caseBudget} | 面积 {item.caseArea}m<sup>2</sup></span>
                                                         </div>
                                                     }
                                                 />
                                             </Card>
                                         </Col>
                                     </Link>
-                                ))
+                                )):'暂无案例'
                             }
                         </Row>
                         <div style={{ textAlign: 'center', marginTop: 20 }}>
-                            <Pagination defaultPageSize={12} showQuickJumper hideOnSinglePage defaultCurrent={1} total={50} onChange={this.onPaginationChange} />
+                            <Pagination 
+                                hideOnSinglePage 
+                                total={this.state.caseData.total}
+                                //pageSize={this.state.caseData.pageSize} 
+                                pageNum={this.state.caseData.pageNum}
+                                onChange={value => {
+                                    this.getCaseData(value,staffId)
+                                }} 
+                            />
                         </div>
                     </Panel>
                 </Collapse>

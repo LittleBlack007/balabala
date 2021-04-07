@@ -1,5 +1,7 @@
 import React from 'react';
-import { Modal, Form, Input, Button, Select } from 'antd';
+import { Modal, Form, Input, Button, Select, message, Upload } from 'antd';
+import {registerStaff,getKindNoPage} from '../../api/index'
+import moment from 'momnet'
 
 const {TextArea} = Input
 const { Option } = Select;
@@ -48,13 +50,28 @@ class AddStaff extends React.Component {
         this.setState({ modalVisible: false })
     };
 
-    onFinish = (values) => {
-        console.log('Received values of form: ', values);
-    };
+    onFinish = async values => {
+        values.staffImg = 'https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=1878364230,3474122270&fm=26&gp=0.jpg'
+        values.staffStart = moment().format("YYYY-MM-DD HH:mm:ss");
+        values.companyId = this.props.companyId;
+        values.staffStatus = 1;
+        const result = await registerStaff(values);
+        if(result.status === 200){
+            if(result.data && result.data.status==='success' && result.data.data>0){
+                message.success("注册成功");
+                this.handleCancel();
+            }else{
+                message.error("账号已经存在！")
+            }
+        }else{
+            message.error("注册失败")
+        }
 
-    componentDidMount() {
-        const a = [{ key: '1', name: '设计师' }, { key: '2', name: '工人' }]
-        this.setState({ a: a })
+    }
+
+    async componentDidMount() {
+        const kind = await getKindNoPage();
+        this.setState({ a: kind.data.data })
     }
 
     render() {
@@ -65,7 +82,7 @@ class AddStaff extends React.Component {
                     添加员工
                 </Button>
                 <Modal title="添加新员工" visible={modalVisible} onCancel={this.handleCancel} footer={null} width={'70%'}>
-                    <Form
+                <Form
                         {...formItemLayout}
                         ref={this.formRef}
                         name="register"
@@ -75,7 +92,7 @@ class AddStaff extends React.Component {
                     >
                         <Form.Item
                             label='用户名'
-                            name="staff_pet_name"
+                            name="staffPetName"
                             rules={[
                                 { required: true, message: '请输入用户名！' },
                                 { min: 4, message: '用户名最小长度为4位！' },
@@ -83,34 +100,11 @@ class AddStaff extends React.Component {
                                 { pattern: /^[A-Za-z1-9_]+$/, message: '用户名以数字，字母和下划线构成！' }
                             ]}
                         >
-                            <Input placeholder="用户名" />
+                            <Input placeholder="用户名" style={{width:'20%'}} />
                         </Form.Item>
                         <Form.Item
-                            name='staff_kind'
-                            label='职业'
-                            rules={[
-                                { required: true, message: '请选择职业类型。' }
-                            ]}
-                        >
-                            <Select>
-                                {this.state.a ? this.state.a.map(item => (<Option key={item.key}>{item.name}</Option>)) : null}
-                            </Select>
-                        </Form.Item>
-                        <Form.Item
-                            name='staff_sex'
-                            label='性别'
-                            rules={[
-                                { required: true, message: '请选择职业类型。' }
-                            ]}
-                        >
-                            <Select placehold='性别'>
-                                <Option value={0}>女</Option>
-                                <Option value={1}>男</Option>
-                            </Select>
-                        </Form.Item>
-                        <Form.Item
-                            name="password"
-                            label="密码"
+                            name="staffPwd"
+                            label="新密码"
                             rules={[
                                 {
                                     required: true,
@@ -119,13 +113,12 @@ class AddStaff extends React.Component {
                             ]}
                             hasFeedback
                         >
-                            <Input.Password />
+                            <Input.Password style={{ width: '30%' }} type="password" placeholder="密码" />
                         </Form.Item>
-
                         <Form.Item
                             name="confirm"
                             label="确认密码"
-                            dependencies={['password']}
+                            dependencies={['staffPwd']}
                             hasFeedback
                             rules={[
                                 {
@@ -134,20 +127,29 @@ class AddStaff extends React.Component {
                                 },
                                 ({ getFieldValue }) => ({
                                     validator(_, value) {
-                                        if (!value || getFieldValue('password') === value) {
+                                        if (!value || getFieldValue('staffPwd') === value) {
                                             return Promise.resolve();
                                         }
-
-                                        return Promise.reject(new Error('The two passwords that you entered do not match!'));
+                                        return Promise.reject(new Error('两个密码不一致'));
                                     },
                                 }),
                             ]}
                         >
-                            <Input.Password />
+                            <Input.Password style={{ width: '30%' }} />
                         </Form.Item>
-
                         <Form.Item
-                            name="staff_name"
+                            name='kindId'
+                            label='职业'
+                            rules={[
+                                { required: true, message: '请选择职业类型。' }
+                            ]}
+                        >
+                            <Select  style={{width:'20%'}}>
+                                {this.state.a ? this.state.a.map(item => (<Option value={item.id}>{item.kindName}</Option>)) : null}
+                            </Select>
+                        </Form.Item>
+                        <Form.Item
+                            name="staffName"
                             label="真实姓名"
                             tooltip="What do you want others to call you?"
                             rules={[
@@ -158,11 +160,11 @@ class AddStaff extends React.Component {
                                 },
                             ]}
                         >
-                            <Input />
+                            <Input  style={{width:'20%'}}/>
                         </Form.Item>
 
                         <Form.Item
-                            name="phone"
+                            name="staffPhone"
                             label="电话号码"
                             rules={[
                                 {
@@ -174,11 +176,11 @@ class AddStaff extends React.Component {
                         >
                             <Input
                                 style={{
-                                    width: '100%',
+                                    width: '30%',
                                 }}
                             />
                         </Form.Item>
-                        <Form.Item
+                        {/* <Form.Item
                             name="person_id"
                             label="身份证号码"
                             rules={[
@@ -194,52 +196,55 @@ class AddStaff extends React.Component {
                                     width: '100%',
                                 }}
                             />
-                        </Form.Item>
-                        <Form.Item label="现住地址">
-                            <Input.Group compact>
-                                <Form.Item
-                                    name={['address', 'province']}
-                                    noStyle
-                                    rules={[
-                                        { required: true, message: '请输入省份！' },
-                                        { pattern: /^[\u4E00-\u9FA5]+$/, message: '请输入汉字！' }
-                                    ]}
-                                >
-                                    <Input style={{ width: '10%' }} placeholder="省份" />
-                                </Form.Item>
-                                <Form.Item
-                                    name={['address', 'city']}
-                                    noStyle
-                                    rules={[
-                                        { required: true, message: '请输入城市！' },
-                                        { pattern: /^[\u4E00-\u9FA5]+$/, message: '请输入汉字！' },
-                                    ]}
-                                >
-                                    <Input style={{ width: '10%' }} placeholder="市" />
-                                </Form.Item>
-                                <Form.Item
-                                    name={['address', 'address']}
-                                    noStyle
-                                    rules={[
-                                        { required: true, message: '请输入详细地址！' },
-                                        { pattern: /^[\u4E00-\u9FA5A-Za-z0-9]+$/, message: '只允许出现文字，数字，英文！' },
-                                    ]}
-                                >
-                                    <Input style={{ width: '80%' }} placeholder="详细地址" />
-                                </Form.Item>
-                            </Input.Group>
+                        </Form.Item> */}
+                        {/* <Form.Item label="现住地址">
+                            <Input.Group compact> */}
+                        <Form.Item
+                            label='省份'
+                            name='staffProvince'
+                            //noStyle
+                            rules={[
+                            
+                                { pattern: /^[\u4E00-\u9FA5]+$/, message: '请输入汉字！' }
+                            ]}
+                        >
+                            <Input style={{ width: '20%' }} placeholder="省份" />
                         </Form.Item>
                         <Form.Item
+                            label='城市'
+                            name='staffCity'
+                            //noStyle
+                            rules={[
+                                { required: true, message: '请输入城市！' },
+                                { pattern: /^[\u4E00-\u9FA5]+$/, message: '请输入汉字！' },
+                            ]}
+                        >
+                            <Input style={{ width: '20%' }} placeholder="市" />
+                        </Form.Item>
+                        <Form.Item
+                            name='staffAddress'
+                            label='详细地址'
+                            //noStyle
+                            rules={[
+                                { required: true, message: '请输入详细地址！' },
+                                { pattern: /^[\u4E00-\u9FA5A-Za-z0-9]+$/, message: '只允许出现文字，数字，英文！' },
+                            ]}
+                        >
+                            <Input style={{ width: '70%' }} placeholder="详细地址" />
+                        </Form.Item>
+                        {/* </Input.Group>
+                        </Form.Item> */}
+                        <Form.Item
                             label="个人简介"
-                            name="person_profile"
+                            name="staffProfile"
                         // rules={[{ required: true }]}
                         // style={{ display: 'inline-block', width: 'calc(50% - 8px)' }}
                         >
-                            <TextArea maxLength={255} autoSize={{ minRows: 4 }} style={{ width: '75%' }} />
+                            <TextArea maxLength={255} autoSize={{ minRows: 4 }} style={{ width: '70%' }} />
                         </Form.Item>
                         <Form.Item {...tailFormItemLayout}>
                             <Button type="primary" htmlType="submit">
-                                确定添加
+                                提交修改
                             </Button>
                         </Form.Item>
                     </Form>

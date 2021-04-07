@@ -9,13 +9,13 @@ class RegisterCompany extends React.Component {
         super(props);
         this.state = {
             avatarUrl:'http://balabala-1300823189.cos.ap-guangzhou.myqcloud.com/balabala/images/360wallpaper_dt16164569544041881695277306635362.jpg',
-            qualificationsUrlArr: '['
+            qualificationsUrlArr: ''
         };
     }
 
     onFinish = async values => {
         values.companyImg = this.state.avatarUrl;
-        values.companyQualifications = this.state.qualificationsUrlArr+']';
+        values.companyQualifications = this.state.qualificationsUrlArr;
         console.log(values.companyQualifications)
         values.companyStatus = 0;
         const result = await registerCompany(values);

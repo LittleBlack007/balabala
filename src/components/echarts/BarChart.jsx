@@ -24,7 +24,8 @@ class BarChart extends React.Component {
       "#9a60b4",
       "#ea7ccc"
     ];
-    const {category,value,label} = this.props.data;
+    const label = this.props.label;
+    const {category,value} = this.props.data;
     const lenght = value.length;
     const dataValue = []
     value.forEach((item,index) => {
@@ -65,21 +66,21 @@ class BarChart extends React.Component {
       yAxis: [
         {
           type: 'value',
-          name: '订单完成量',
+          name: label,
           nameLocation:'center',
           nameGap:'80',
           nameTextStyle:{
             fontSize:'16',
           },
           axisLabel: {
-            formatter: '{value}个'
+            formatter: '{value}'
           },
         }
       ],
       series: [
         {
           type: 'bar',
-          name:'完成订单总数',
+          name:label,
           //barWidth: '80%',
           label: {
             show: true,

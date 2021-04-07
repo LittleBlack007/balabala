@@ -2,7 +2,7 @@ import React from 'react';
 import { message, Card, Form, Input, Button, Select, Upload } from 'antd';
 import './register.less';
 import moment from 'momnet';
-import {registerStaff} from '../../api/index';
+import {registerStaff,getKindNoPage} from '../../api/index';
 
 const { Option } = Select;
 const { TextArea } = Input
@@ -56,9 +56,9 @@ class RegisterStaff extends React.Component {
         }
 
     }
-    componentDidMount() {
-        const a = [{ key: 1, name: '设计师' }, { key: 2, name: '工人' }]
-        this.setState({ a: a })
+    async componentDidMount() {
+        const kind = await getKindNoPage();
+        this.setState({ a: kind.data.data })
     }
 
     render() {

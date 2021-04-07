@@ -1,6 +1,10 @@
 import React from 'react';
-import { Table, Button, Popconfirm } from 'antd';
+import { Table, Button, Popconfirm, Input, Card, message } from 'antd';
 import {Link} from 'react-router-dom';
+import {getStaffByCompanyIdStaffName,deleteStaff,getKindNoPage} from '../../api/index'
+import memoryUtils from '../../utils/memoryUtils';
+import moment from 'moment';
+import Avatar from 'antd/lib/avatar/avatar';
 
 const dataSource = [
     {
@@ -38,70 +42,121 @@ const dataSource = [
     }
 ];
 
-const columns = [
-    {
-        title: '员工ID',
-        dataIndex: 'staff_id',
-        key: 'staff_id',
-    },
-    {
-        title: '头像',
-        dataIndex: 'staff_avtar',
-        key: 'staff_avtar',
-        render: show => (<img src={show} alt='展示图片' style={{width:'200px' ,height:'120px'}} />)
-    },
-    {
-        title: '名字',
-        dataIndex: 'staff_name',
-        key: 'staff_name',
-    },
-    {
-        title: '用户名',
-        dataIndex: 'staff_pet_name',
-        key: 'staff_pet_name',
-    },
-    {
-        title: '电话',
-        dataIndex: 'staff_phone',
-        key: 'staff_phone',
-    },
-    {
-        title: '职位',
-        dataIndex: 'staff_kind',
-        key: 'staff_kind',
-    },
-    {
-        title: '操作',
-        key: 'action',
-        render: (text, record) => (<>
-            <Link to='/balabala/company-display/case'>查看</Link>&nbsp;
-            <Popconfirm 
-                title="确定删除该员工吗？" 
-                okText="确定" 
-                cancelText="取消" 
-                onConfirm={()=>console.log('ok')}
-            >
-                <Button type='link'>删除</Button>
-            </Popconfirm>
-        </>),
-      },
-];
+
 
 class StaffManage extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-
+            staffData:{},
+            staffName:'',
+            kindList:[],
         };
+    }
+    columns = [
+        {
+            title: '员工ID',
+            dataIndex: 'id',
+            key: 'staff_id',
+        },
+        {
+            title: '头像',
+            dataIndex: 'staffImg',
+            key: 'staff_avtar',
+            render: show => (<Avatar src={show} alt='图片' />)
+        },
+        {
+            title: '名字',
+            dataIndex: 'staffName',
+            key: 'staff_name',
+        },
+        {
+            title: '用户名',
+            dataIndex: 'staffPetName',
+            key: 'staff_pet_name',
+        },
+        {
+            title: '电话',
+            dataIndex: 'staffPhone',
+            key: 'staff_phone',
+        },
+        {
+            title: '职位',
+            dataIndex: 'kindId',
+            key: 'staff_kind',
+            render: text =>{
+                const show = this.state.kindList.find(item => {return item.id === text})
+                if(show){
+                    return show.kindName
+                }
+            }
+        },
+        {
+            title: '操作',
+            key: 'action',
+            render: (text, record) => (<>
+                <Link to={`/balabala/staff/${record.id}`}>查看</Link>&nbsp;
+                <Popconfirm 
+                    title="确定删除该员工吗？" 
+                    okText="确定" 
+                    cancelText="取消" 
+                    onConfirm={async()=>{
+                        const result = await deleteStaff(record.id)
+                        if(result.data && result.data.data ===1){
+                            message.success("成功")
+                            this.getStaffData(1,parseInt(memoryUtils.company.id),this.state.staffName)
+                        }else{
+                            message.error("失败")
+                        }
+                    }}
+                >
+                    <Button type='link'>删除</Button>
+                </Popconfirm>
+            </>),
+          },
+    ];
+
+    async componentDidMount(){
+        const companyId = parseInt(memoryUtils.company.id)
+        this.getStaffData(1,companyId,this.state.staffName)
+        this.getKind();
+    }
+    getKind = async() =>{
+        const result = await getKindNoPage();
+        if(result.data && result.data.data){
+            this.setState({kindList:result.data.data});
+        }
+    }
+    getStaffData = async (pageNum,companyId,staffName) => {
+        const result = await getStaffByCompanyIdStaffName(pageNum,companyId,staffName);
+        if(result.data && result.data.data){
+            this.setState({staffData:result.data.data});
+        }
     }
 
     render() {
+        const companyId = parseInt(memoryUtils.company.id);
+        const {staffName,staffData} = this.state;
         return (
+            
             <div>
+                <Input.Search enterButton style={{width:'160px',marginBottom:'20px'}} placeholder="输入员工名字"
+                    onSearch={value => {
+                        this.getStaffData(1,companyId,value);
+                        this.setState({staffName:value})
+                    }}
+                />
                 <Table
-                    dataSource={dataSource}
-                    columns={columns}
-                    pagination={{defaultPageSize:2,total:100}}
+                    dataSource={staffData.list}
+                    columns={this.columns}
+                    pagination={{
+                        total:staffData.total,
+                        pageNum:staffData.pageNum,
+                        pageSize:staffData.pageSize,
+                        onChange:value => {
+                            this.getStaffData(value,companyId,staffName);
+                        }
+                    }}
                 />
             </div>
         )

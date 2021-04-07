@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import HD1 from '../../assets/images/huodong1.jpg';
 import HD2 from '../../assets/images/huodong2.jpg';
 import HD3 from '../../assets/images/huodong3.jpg';
-import {getAdvertisements,getGoddCompany,getCompany,getGoodStaff} from '../../api/index';
+import {getAdvertisements,getGoddCompany,getCompany,getGoodStaff,getKindNoPage} from '../../api/index';
 
 
 const contentStyle ={height:362,width:'100%'}
@@ -49,6 +49,10 @@ class Balabala extends React.Component {
             companyName:'',
             staffCity:'',
             companySearchType:'',
+            kindList:[],
+            staffKind:null,
+            staffSearchText:'',
+            staffSearchType:'',
         };
     }
 
@@ -56,6 +60,13 @@ class Balabala extends React.Component {
         this.getAd();
         this.getGoodCompanyList();
         this.getGoodStaffList()
+        this.getKind();
+    }
+    getKind= async() =>{
+        const result = await getKindNoPage();
+        if(result.data && result.data.data){
+            this.setState({kindList:result.data.data})
+        }
     }
     getAd = async () => {
         const result = await getAdvertisements();
@@ -83,11 +94,12 @@ class Balabala extends React.Component {
         }
     }
     onStaffChange =async value => {
+        const {staffSearchText,staffSearchType,staffKind} = this.state;
         if(value === 'order'){
-            const result = await getGoodStaff();
+            const result = await getGoodStaff(1,null,staffSearchType==='staffCity'?staffSearchText:'',staffKind,staffSearchType==='staffName'?staffSearchText:'')
             this.setState({staffListData:result.data.data,staffType:'order'})
         }else{
-            const result = await getGoodStaff(1,1);
+            const result = await getGoodStaff(1,1,staffSearchType==='staffCity'?staffSearchText:'',staffKind,staffSearchType==='staffName'?staffSearchText:'')
             this.setState({staffListData:result.data.data,staffType:'rated'})
         }
     }
@@ -102,13 +114,13 @@ class Balabala extends React.Component {
         }
     }
     onStaffSearch= async value => {
-        const {staffType} = this.state;
+        const {staffType,staffSearchType,staffKind} = this.state;
         if(staffType=== 'order'){
-            const result = await getGoodStaff(1,null,value);
-            this.setState({staffListData:result.data.data,staffCity:value})
+            const result = await getGoodStaff(1,null,staffSearchType==='staffCity'?value:'',staffKind,staffSearchType==='staffName'?value:'')
+            this.setState({staffListData:result.data.data,staffSearchText:value})
         }else{
-            const result = await getGoodStaff(1,1,value);
-            this.setState({staffListData:result.data.data,staffCity:value})
+            const result = await getGoodStaff(1,1,staffSearchType==='staffCity'?value:'',staffKind,staffSearchType==='staffName'?value:'')
+            this.setState({staffListData:result.data.data,staffSearchText:value})
         }
     }
     onComPageChange = async value => {
@@ -122,12 +134,12 @@ class Balabala extends React.Component {
         }
     }
     onStaffPageChange = async value => {
-        const {staffType,staffCity} = this.state;
+        const {staffType,staffKind,staffSearchType,staffSearchText} = this.state;
         if(staffType=== 'order'){
-            const result = await getGoodStaff(value,null,staffCity);
+            const result = await getGoodStaff(value,null,staffSearchType==='staffCity'?staffSearchText:'',staffKind,staffSearchType==='staffName'?staffSearchText:'')
             this.setState({staffListData:result.data.data})
         }else{
-            const result = await getGoodStaff(value,1,staffCity);
+            const result = await getGoodStaff(value,1,staffSearchType==='staffCity'?staffSearchText:'',staffKind,staffSearchType==='staffName'?staffSearchText:'')
             this.setState({staffListData:result.data.data})
         }
     }
@@ -141,13 +153,13 @@ class Balabala extends React.Component {
     }
 
     render() {
-        const {companyListData,companyType,staffType,staffListData} = this.state;
+        const {companyListData,companyType,staffType,staffListData,staffSearchText,staffSearchType} = this.state;
         return (
             <Card bodyStyle={{padding:0}}>
                 <Carousel autoplay>
                     {this.state.ad.length>=1
                         ?this.state.ad.map(item => 
-                            <a href={item.adUrl}>
+                            <a href={item.adUrl} target='blank'>
                                 <img style={contentStyle} src={item.adPicture} alt={item.adTitle} />
                             </a>)
                         :<div><img style={contentStyle} src={HD1} alt='广告' /></div>
@@ -162,10 +174,7 @@ class Balabala extends React.Component {
                             <Option value='rated' >好评最多</Option>
                             <Option value='order' >订单最多</Option>
                         </Select>
-                        {/* <Select defaultValue='companyCity' bordered={false} onChange={this.onCompanySearchChange}>
-                            <Option value='companyName' >按名字</Option>
-                            <Option value='companyCity' >按地区</Option>
-                        </Select> */}
+                        
                         <Input.Search placeholder='按名字搜索' style={{width:'200px'}} onSearch={this.onCompanySearch}/>
                     </>}
                 >
@@ -203,16 +212,29 @@ class Balabala extends React.Component {
                 <Card
                     style={{ marginTop: '16px' }}
                     bordered={false}
-                    title={<span style={{ fontWeight: 500, fontSize: '18px' }}>施工人员</span>}
+                    title={<span style={{ fontWeight: 500, fontSize: '18px' }}>平台员工</span>}
                     extra={<>
                         <Select defaultValue='order' bordered={false} onChange={this.onStaffChange}>
                             <Option value='rated' >好评最多</Option>
                             <Option value='order' >订单最多</Option>
                         </Select>
-                        <Input.Search placeholder='按地区搜索' style={{width:'200px'}} onSearch={this.onStaffSearch}/>
+                        <Select  style={{width:'110px'}} placeholder="-全部职业-" bordered={false} 
+                            onChange={async value =>{
+                                const result = await getGoodStaff(1,staffType==='order'?null:1,staffSearchType==='staffCity'?staffSearchText:'',value,staffSearchType==='staffName'?staffSearchText:'')
+                                this.setState({staffListData:result.data.data,staffKind:value})
+                            }}
+                        > 
+                            <Option value={null}>全部</Option>
+                            {this.state.kindList ? this.state.kindList.map(item => (<Option value={item.id}>{item.kindName}</Option>)) : null}
+                        </Select>
+                        <Select placeholder='搜索类型' bordered={false} onChange={value => this.setState({staffSearchType:value})}>
+                            <Option value='staffName' >按名字</Option>
+                            <Option value='staffCity' >按地区</Option>
+                        </Select>
+                        <Input.Search placeholder='搜索' style={{width:'160px'}} onSearch={this.onStaffSearch}/>
                     </>}
                 >
-                    <Row gutter={16}>
+                    <Row gutter={16} style={{marginBottom:'20px'}}>
                         {staffListData && staffListData.list ?
                             staffListData.list.map((item,index) => (
                                 <Link to={`/balabala/staff/${item.id}`}>

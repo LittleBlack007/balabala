@@ -7,6 +7,9 @@ import './index.less';
 import BarChart from '../../components/echarts/BarChart';
 import DrawerContain from './drawer-contain';
 import AddStaff from './add-staff';
+import {getCompanyRevenue,getCompanyOrderTotalNum,
+    getExcellentStaff,getExcellentStaffForRevenue,
+} from '../../api/index'
 
 const category = ['家庭存款','日常的银行服务','退休','文化程度','储蓄','管理债务','投资额','汽车贷款'];
 const value =[5,5,10,4,3,4,5,2];
@@ -22,7 +25,10 @@ class CompanyManage extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-
+            companyRevenue:0,
+            companyTotalOrder:0,
+            excellentStaffList:[],
+            excellentStaffRevenueList:[],
         };
     }
 
@@ -39,12 +45,44 @@ class CompanyManage extends React.Component {
             onCancel: () => {}
         })
     }
+    async componentDidMount(){
+        const companyId = parseInt(memoryUtils.company.id);
+        this.getCompanyOR(companyId);
+        this.getExcellentStaffList(companyId);
+        this.getExcellentStaffRevenueList(companyId);
+    }
+    getCompanyOR = async companyId => {
+        const r = await getCompanyRevenue(companyId);
+        const o = await getCompanyOrderTotalNum(companyId);
+        if(r.data && r.data.data && o.data && o.data.data){
+            this.setState({companyRevenue:r.data.data,companyTotalOrder:o.data.data})
+        }
+       
+    }
+    getExcellentStaffList = async(companyId) => {
+        const result = await getExcellentStaff(companyId);
+        this.setState({excellentStaffList:result.data.data});
+    }
+    getExcellentStaffRevenueList = async(companyId) => {
+        const result = await getExcellentStaffForRevenue(companyId);
+        this.setState({excellentStaffRevenueList:result.data.data});
+    }
+    toBarData = (list) => {
+        let data = {category:[],value:[]};
+        list.forEach(item => {
+            data.category.push(item.staff_name || item.company_name)
+            data.value.push(item.total)
+        })
+        return data;
+    }
 
     render() {
         const company = memoryUtils.company;
         if(!company.companyStatus){
             return <Redirect to={"/login/company"} />
         }
+        const companyId = parseInt(company.id)
+        const {companyRevenue,companyTotalOrder,excellentStaffList,excellentStaffRevenueList} = this.state
         return (
             <div>
                 <div style={{display:'flex',marginBottom:'20px',height:'60px',backgroundColor:'#1DA57A',color:'white',alignItems:'center',justifyContent:'space-between'}}>
@@ -54,24 +92,24 @@ class CompanyManage extends React.Component {
                     <div>
                         <Link  style={{color:'white'}} to='/company-manage'>
                             <Avatar src={company.companyImg} />&nbsp;
-                            平行空间家装
+                            {company.companyPetName}
                         </Link>&nbsp;&nbsp;&nbsp;
                         <Link to='/' style={{color:'white'}}>平台首页</Link>
-                        <AddStaff />
+                        <AddStaff companyId={companyId} />
                         <Button type='link' onClick={this.logout}>
-                            <Link to='/' style={{color:'white'}}>退出</Link>
+                            <span to='/' style={{color:'white'}}>退出</span>
                         </Button>
                     </div>
                 </div>
                 <Row gutter={24} justify='center' style={{margin:'20px 0px'}} >
                     <Col span={6}>
                         <Card style={{backgroundColor:'#91CC75',borderRadius:'8px'}}>
-                            <Statistic title="订单总收入(￥)" value={112893} precision={2} />
+                            <Statistic title="订单总收入(￥)" value={companyRevenue} precision={2} />
                         </Card>
                     </Col>
                     <Col span={6}>
                         <Card style={{backgroundColor:'#73C0DE',borderRadius:'8px'}}>
-                            <Statistic title="客户数(个)" value={1893}  />
+                            <Statistic title="订单总达成数(个)" value={companyTotalOrder}  />
                         </Card>
                     </Col>
                 </Row>
@@ -103,13 +141,13 @@ class CompanyManage extends React.Component {
                 </Row>
                 <Row gutter={24} style={{marginTop:'20px'}}>
                     <Col {...colPhone} xl={12}>
-                        <Card title="优秀设计师前十榜单">
-                            <BarChart data={{category,value,label:'完成订单总数'}}/>
+                        <Card title="收入前十榜单">
+                            <BarChart data={{...this.toBarData(excellentStaffRevenueList)}} label="个人总收入"/>
                         </Card>
                     </Col>
                     <Col {...colPhone} xl={12}>
-                        <Card title="优秀工人前十榜单">
-                            <BarChart data={{category,value,label:'完成工地总数'}}/>
+                        <Card title="订单数前十榜单">
+                            <BarChart data={{...this.toBarData(excellentStaffList)}} label='个人总订单数' />
                         </Card>
                     </Col>
                 </Row>

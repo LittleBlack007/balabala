@@ -52,14 +52,20 @@ export const getCompanyById = id =>ajax("/company/get-company-by-id",{id})
 export const reqStaffLogin = staff => ajax("/staff/login",staff,"POST")
 //更新员工信息
 export const updateStaff = staff => ajax("/staff/update-staff",staff,"POST")
+//删除员工信息
+export const deleteStaff = id => ajax('/staff/delete-staff',{id});
 //注册接口
 export const registerStaff = staff => ajax("/staff/register",staff,"POST")
 //查询好公司
-export const getGoodStaff = (pageNum=1,orderRatedStatus=null,staffCity='') => ajax("/staff/get-good-staff",{pageNum,orderRatedStatus,staffCity});
+export const getGoodStaff = (pageNum=1,orderRatedStatus=null,staffCity='',kindId=null,staffName='') => ajax("/staff/get-good-staff",{pageNum,orderRatedStatus,staffCity,kindId,staffName});
 //通过id查找员工
 export const getStaffById = id => ajax('/staff/get-staff-by-id',{id});
 //通过公司id查询所有员工卡片，包含订单数，职业/get-staff-by-company-id
 export const getGoodStaffByCompanyId = (pageNum=1,companyId=null) => ajax('/staff/get-staff-by-company-id',{pageNum,companyId});
+//根据公司id和员工名字查询员工list
+export const getStaffByCompanyIdStaffName = (pageNum=1,companyId,staffName) => ajax('/staff/get-staff-by-companyId',{pageNum,companyId,staffName})
+
+
 
 /**
  * 帖子接口
@@ -138,11 +144,33 @@ export const getOrderTotalNum = (companyId=null,startDate=null,endDate=null) => 
 export const getOrderTotalGoodNum = (companyId=null,startDate=null,endDate=null,orderRatedStatus=null) => ajax('/order/get-total-order-good-num',{companyId,startDate,endDate,orderRatedStatus});
 //查询员工的订单数和好评数
 export const getTotalOrderGoodNumForStaff = (staffId=null,orderRatedStatus=null) => ajax('/order/get-total-order-good-num-for-staff',{staffId,orderRatedStatus});
-//查询订单 可传入用户id，员工id，订单类型，订单状态，不传则查询全部
-export const  getOrderUserStaffByUSTS = (pageNum=1,userId=null,staffId=null,orderType='',orderStatus=null) => ajax("/order//get-order-user-by-USTS",{pageNum,userId,staffId,orderType,orderStatus})
+//查询订单 可传入用户id，员工id，订单类型，订单状态，不传则查询全部-----------
+export const  getOrderUserStaffByUSTS = (pageNum=1,userId=null,staffId=null,orderType='',orderStatus=null,staffName='',companyId=null) => ajax("/order//get-order-user-by-USTS",{pageNum,userId,staffId,orderType,orderStatus,staffName,companyId})
+//更新订单
+export const updateOrder = post => ajax('/order/update',post, "POST");
+//删除订单
+export const deleteOrder = id => ajax("/order/delete-order",{id})
+//查询员工总收入
+export const getStaffRevenue = (staffId=null,startDate=null,endDate=null) => ajax('/order/get-staff-revenue',{staffId,startDate,endDate});
+//查询员工总订单数
+export const getStaffTotalOrderNum = (staffId=null,startDate=null,endDate=null) => ajax('/order/get-staff-total-order-num',{staffId,startDate,endDate});
+//添加订单
+export const addOrder = order => ajax('/order/add-order',order,"POST");
+//通过公司id，查询订单收入，不传查全部
+export const getCompanyRevenue = (companyId=null,startDate=null,endDate=null) => ajax('/order/get-revenue',{companyId,startDate,endDate});
+//通过公司id，查询总订单数，不传查全部
+export const getCompanyOrderTotalNum = (companyId=null,startDate=null,endDate=null) => ajax('/order/get-total-order-num',{companyId,startDate,endDate});
+//查询优秀员工,前十员工，不传公司id查全部
+export const getExcellentStaff = (companyId=null) => ajax('/order/get-excellent-staff-all',{companyId});
+//查询公司收入前十的员工，不传查全部公司的前十员工get-excellent-staff-for-revenue
+export const getExcellentStaffForRevenue = (companyId=null) => ajax('/order/get-excellent-staff-for-revenue',{companyId}); 
+
+
 /**
  * 案例
 */
+//创建案例
+export const createCase = c => ajax('/case/create',c,"POST");
 //查询所有案例
 export const getCases = (pageNum=1,title='') => ajax("/case/get-case",{pageNum,title});
 //通过公司id查询案例/get-case-by-companyId
@@ -151,16 +179,25 @@ export const getCasesByCompanyId = (pageNum=1,companyId) => ajax("/case/get-case
 export const getCaseByStaffId = (pageNum=1,staffId) => ajax('/case/get-case-by-staffId',{pageNum,staffId});
 //通过id查看案例信息
 export const getCaseById = id => ajax('/case/get-case-by-id',{id});
+////查询公司的所有案例,通过comapnyid+staffName+casetitle，可传可不传
+export const getCaseStaffByCST = (pageNum=1,companyId=null,staffName='',caseTitle='') => ajax('/case/get-caseStaff-by-CST',{pageNum,companyId,staffName,caseTitle});
+
+
 /**
  * 评价
 */
 //根据评价等级和staffid查询评价+user信息
 export const getRateUser = (pageNum=1,staffId=null,rateGrade=null) => ajax('/rate/get-rate-user',{pageNum,staffId,rateGrade});
+//通过id查询评价
+export const getRateById = id => ajax('/rate/get-rate-by-id',{id})
+//添加评价
+export const createRate = rate => ajax('/rate/create',rate,'POST');
 
 /**
- * 订单
+ * 职业
 */
-//添加订单
-export const addOrder = order => ajax('/order/add-order',order,"POST");
+//查询全部不分页
+export const getKindNoPage = () => ajax('/kind/get-kind-no-page')
+
 
 
