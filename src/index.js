@@ -1,17 +1,27 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
 import App from './App';
-import reportWebVitals from './reportWebVitals';
+import memoryUtils from './utils/memoryUtils'
+import storageUtils from './utils/storageUtils'
+// import 'antd/dist/antd.css'
+
+//当点击页面刷新时，把localStroage的用户信息保存到内存中，维持登录状态
+const user = storageUtils.getUser();
+const staff = storageUtils.getStaff();
+const company = storageUtils.getCompany();
+
+if(user && user.userStatus){
+    memoryUtils.user = user
+}
+if(staff && staff.staffStatus){
+  memoryUtils.staff = staff
+}
+if(company && company.companyStatus){
+  memoryUtils.company = company
+}
+
 
 ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
+  <App />,
   document.getElementById('root')
 );
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();

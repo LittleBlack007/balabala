@@ -1,25 +1,38 @@
-import logo from './logo.svg';
-import './App.css';
+import React,{Component} from 'react'
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import CompanyManage from './pages/company-manage';
+import Main from '../src/pages/main'
+import StaffCenter from './pages/staff';
+import User from './pages/user';
+import Login from './pages/login';
+import RegisterUser from './pages/register/register-user';
+import RegisterStaff from './pages/register/register-staff';
+import RegisterCompany from './pages/register/register-company';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends Component {
+  constructor(props){
+    super(props);
+    this.state = {
+
+    }
+  }
+
+  render(){
+    return(
+      <BrowserRouter>
+        <Switch>
+          <Route path="/register/staff" component={RegisterStaff} />
+          <Route path="/register/company" component={RegisterCompany} />
+          <Route path="/register/user" component={RegisterUser} />
+          <Route path="/login/:type" component={Login} />
+          <Route path="/user-manage" component={User} / >
+          <Route path='/staff-manage' component={StaffCenter} />
+          <Route path='/company-manage' component={CompanyManage} />
+          <Route path='/' component={Main} />
+        </Switch>
+      </BrowserRouter>
+    )
+  }
 }
 
 export default App;
